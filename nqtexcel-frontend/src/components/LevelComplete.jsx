@@ -101,13 +101,6 @@ function LevelComplete() {
           </button>
         </div>
 
-        <div className="motivational-quote">
-          {isPerfect ? (
-            <p>"Excellence is not a destination; it is a continuous journey." - Brian Tracy</p>
-          ) : (
-            <p>"Success is the sum of small efforts repeated day in and day out." - Robert Collier</p>
-          )}
-        </div>
       </div>
     </div>
   );
