@@ -78,15 +78,12 @@ function WorldMap({ compact = false }) {
     return `${completed}/10 (${Math.round((completed / 10) * 100)}%)`;
   };
 
-  // ✅ Fix #3:
-  // Previously your world-node IDs could clash with the WORLD SECTION cards below if they also use id="world-1".
-  // Now nodes are "map-world-1" and clicks will scroll to the section card "world-1" if it exists.
   const handleWorldClick = (worldNum) => {
     if (compact) return;
     const status = getWorldStatus(worldNum);
     if (status === "locked") return;
 
-    const sectionEl = document.getElementById(`world-${worldNum}`); // likely your world card below
+    const sectionEl = document.getElementById(`world-${worldNum}`);
     if (sectionEl) {
       sectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
@@ -115,7 +112,6 @@ function WorldMap({ compact = false }) {
   };
 
   const getTooltipAlignClass = (worldNum) => {
-    // ✅ Fix #1: keep tooltip inside view for edge nodes
     if (worldNum <= 2) return "tooltip-right";
     if (worldNum >= 9) return "tooltip-left";
     return "tooltip-center";
@@ -139,7 +135,6 @@ function WorldMap({ compact = false }) {
     : worlds.reduce((acc, w) => acc + w.levels.filter((l) => l.is_completed).length, 0);
 
   return (
-    // ✅ Fix #2: separation from the sections below is handled in CSS (margin-bottom + divider)
     <div className={`neo-world-map ${compact ? "compact" : ""}`}>
       {!compact && (
         <div className="map-header">
@@ -173,21 +168,9 @@ function WorldMap({ compact = false }) {
           <div className="scanline-layer" />
           <div className="noise-layer" />
 
-          {/* Curved path */}
+          {/* Curved path - brand colors, no gradients */}
           <svg className="path-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
             <defs>
-              <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.95" />
-                <stop offset="45%" stopColor="#A78BFA" stopOpacity="0.95" />
-                <stop offset="100%" stopColor="#34D399" stopOpacity="0.95" />
-              </linearGradient>
-
-              <linearGradient id="pathGlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.35" />
-                <stop offset="45%" stopColor="#A78BFA" stopOpacity="0.35" />
-                <stop offset="100%" stopColor="#34D399" stopOpacity="0.35" />
-              </linearGradient>
-
               <filter id="glowStrong">
                 <feGaussianBlur stdDeviation="7" result="blur1" />
                 <feGaussianBlur stdDeviation="2" result="blur2" />
@@ -210,7 +193,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="rgba(255,255,255,0.14)"
+              stroke="#D8DDE1"
               strokeWidth="10"
               strokeLinecap="round"
               className="path-background"
@@ -219,7 +202,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="url(#pathGlowGradient)"
+              stroke="rgba(15, 93, 74, 0.3)"
               strokeWidth="18"
               strokeLinecap="round"
               filter="url(#glowStrong)"
@@ -229,7 +212,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="url(#pathGradient)"
+              stroke="#0F5D4A"
               strokeWidth="7"
               strokeLinecap="round"
               filter="url(#softGlow)"
@@ -240,7 +223,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="rgba(255,255,255,0.55)"
+              stroke="rgba(30, 42, 56, 0.4)"
               strokeWidth="2.5"
               strokeLinecap="round"
               className="path-spark"
@@ -275,7 +258,6 @@ function WorldMap({ compact = false }) {
               >
                 <div className="node-glow" aria-hidden="true" />
 
-                {/* ✅ Fix #1: tooltip is now outside clipped viewport and aligned */}
                 {showTooltip && (
                   <div className={`world-tooltip ${getTooltipAlignClass(worldNum)}`}>
                     <div className="tooltip-title">World {worldNum}</div>
@@ -375,7 +357,6 @@ function WorldMap({ compact = false }) {
         </div>
       )}
 
-      {/* ✅ Fix #2: clear visual gap to the sections below */}
       {!compact && <div className="map-divider" aria-hidden="true" />}
     </div>
   );
