@@ -168,9 +168,21 @@ function WorldMap({ compact = false }) {
           <div className="scanline-layer" />
           <div className="noise-layer" />
 
-          {/* Curved path - brand colors, no gradients */}
+          {/* Curved path - RESTORED GRADIENTS */}
           <svg className="path-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
             <defs>
+              <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.95" />
+                <stop offset="45%" stopColor="#A78BFA" stopOpacity="0.95" />
+                <stop offset="100%" stopColor="#34D399" stopOpacity="0.95" />
+              </linearGradient>
+
+              <linearGradient id="pathGlowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#38BDF8" stopOpacity="0.35" />
+                <stop offset="45%" stopColor="#A78BFA" stopOpacity="0.35" />
+                <stop offset="100%" stopColor="#34D399" stopOpacity="0.35" />
+              </linearGradient>
+
               <filter id="glowStrong">
                 <feGaussianBlur stdDeviation="7" result="blur1" />
                 <feGaussianBlur stdDeviation="2" result="blur2" />
@@ -193,7 +205,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="#D8DDE1"
+              stroke="rgba(255,255,255,0.14)"
               strokeWidth="10"
               strokeLinecap="round"
               className="path-background"
@@ -202,7 +214,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="rgba(15, 93, 74, 0.3)"
+              stroke="url(#pathGlowGradient)"
               strokeWidth="18"
               strokeLinecap="round"
               filter="url(#glowStrong)"
@@ -212,7 +224,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="#0F5D4A"
+              stroke="url(#pathGradient)"
               strokeWidth="7"
               strokeLinecap="round"
               filter="url(#softGlow)"
@@ -223,7 +235,7 @@ function WorldMap({ compact = false }) {
             <path
               d={generatePath()}
               fill="none"
-              stroke="rgba(30, 42, 56, 0.4)"
+              stroke="rgba(255,255,255,0.55)"
               strokeWidth="2.5"
               strokeLinecap="round"
               className="path-spark"

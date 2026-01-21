@@ -1,6 +1,7 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import HomePage from './components/HomePage';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Level from './components/Level';
@@ -108,33 +109,52 @@ function App() {
     <AuthContext.Provider value={{ user, login, logout, fetchUserProfile, API_URL }}>
       <Router>
         <Routes>
+          {/* Landing Page (Homepage) */}
+          <Route 
+            path="/" 
+            element={!user ? <HomePage /> : <Navigate to="/dashboard" />} 
+          />
+          
+          {/* Login */}
           <Route 
             path="/login" 
             element={!user ? <Login /> : <Navigate to="/dashboard" />} 
           />
+          
+          {/* Dashboard */}
           <Route 
             path="/dashboard" 
-            element={user ? <Dashboard /> : <Navigate to="/login" />} 
+            element={user ? <Dashboard /> : <Navigate to="/" />} 
           />
+          
+          {/* Level Gameplay */}
           <Route 
             path="/level/:world/:level" 
-            element={user ? <Level /> : <Navigate to="/login" />} 
+            element={user ? <Level /> : <Navigate to="/" />} 
           />
+          
+          {/* Level Complete */}
           <Route 
             path="/level-complete" 
-            element={user ? <LevelComplete /> : <Navigate to="/login" />} 
+            element={user ? <LevelComplete /> : <Navigate to="/" />} 
           />
+          
+          {/* Leaderboard */}
           <Route 
             path="/leaderboard" 
-            element={user ? <Leaderboard /> : <Navigate to="/login" />} 
+            element={user ? <Leaderboard /> : <Navigate to="/" />} 
           />
+          
+          {/* Profile */}
           <Route 
             path="/profile" 
-            element={user ? <Profile /> : <Navigate to="/login" />} 
+            element={user ? <Profile /> : <Navigate to="/" />} 
           />
+          
+          {/* Catch all - redirect to homepage */}
           <Route 
-            path="/" 
-            element={<Navigate to={user ? "/dashboard" : "/login"} />} 
+            path="*" 
+            element={<Navigate to="/" />} 
           />
         </Routes>
       </Router>

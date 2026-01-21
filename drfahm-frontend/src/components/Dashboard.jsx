@@ -40,20 +40,12 @@ function Dashboard() {
     }
   };
 
+  // Brand-compliant colors: Academic Navy with slight variations
   const getWorldColor = (worldNum) => {
-    const colors = [
-      '#00FF00', // Green
-      '#0099FF', // Blue
-      '#FFD700', // Gold
-      '#FF6B6B', // Red
-      '#9B59B6', // Purple
-      '#00FF00', // Green
-      '#0099FF', // Blue
-      '#FFD700', // Gold
-      '#FF6B6B', // Red
-      '#9B59B6', // Purple
-    ];
-    return colors[worldNum - 1];
+    // All worlds use Academic Navy theme
+    // Verbal worlds (1-5): Academic Navy
+    // Math worlds (6-10): Slightly lighter Navy
+    return worldNum <= 5 ? '#1E2A38' : '#2A3847';
   };
 
   if (loading) {
