@@ -90,7 +90,7 @@ function HomePage() {
         <div className="container">
           <div className="trust-grid">
             <div className="trust-item">
-              <div className="trust-icon"></div>
+              <div className="trust-icon">📊</div>
               <h3>Diagnostic-led preparation</h3>
               <p>Not random practice</p>
             </div>
@@ -108,7 +108,7 @@ function HomePage() {
             </div>
             
             <div className="trust-item">
-              <div className="trust-icon"></div>
+              <div className="trust-icon">🏢</div>
               <h3>Individual and institutional use</h3>
               <p>Scalable for all</p>
             </div>
@@ -182,7 +182,7 @@ function HomePage() {
 
             {/* Schools & Organisations */}
             <div className="audience-card" id="for-schools">
-              <div className="audience-icon"></div>
+              <div className="audience-icon">🏫</div>
               <h3>For Schools & Organisations</h3>
               
               <ul className="audience-benefits">
@@ -276,17 +276,17 @@ function HomePage() {
             
             <div className="environment-features">
               <div className="env-feature">
-                <div className="env-icon"></div>
+                <div className="env-icon">🚫</div>
                 <h4>No public leaderboards</h4>
               </div>
               
               <div className="env-feature">
-                <div className="env-icon"></div>
+                <div className="env-icon">🎯</div>
                 <h4>No superficial gamification</h4>
               </div>
               
               <div className="env-feature">
-                <div className="env-icon"></div>
+                <div className="env-icon">✨</div>
                 <h4>No performance pressure</h4>
               </div>
             </div>
