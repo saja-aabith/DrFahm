@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HomePage.css';
 
 function HomePage() {
   const navigate = useNavigate();
-  const [language, setLanguage] = useState('en');
+  const [currentExam, setCurrentExam] = useState(0);
+  const [expandedCard, setExpandedCard] = useState(null);
+  const exams = ['Qudurat', 'Tahsili', 'NAFS'];
+
+  // Rotating exam text effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentExam((prev) => (prev + 1) % exams.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -14,322 +24,464 @@ function HomePage() {
   };
 
   return (
-    <div className="homepage">
-      {/* Navigation */}
-      <nav className="landing-nav">
-        <div className="landing-nav-container">
-          <div className="nav-logo">
-            <h1>Dr Fahm</h1>
-            <span className="nav-tagline">National Assessment & Readiness Platform</span>
+    <div className="homepage-new">
+      {/* ==================== NAVIGATION ==================== */}
+      <nav className="nav-institutional">
+        <div className="nav-container">
+          <div className="nav-brand">
+            <h1 onClick={() => navigate('/')}>Dr Fahm</h1>
+            <span className="nav-subtitle">National Assessment & Readiness Platform</span>
           </div>
           
           <div className="nav-actions">
-            <button onClick={() => scrollToSection('for-schools')} className="btn-nav-secondary">
+            <button 
+              onClick={() => scrollToSection('for-schools')} 
+              className="btn-nav-secondary"
+            >
               For Schools
             </button>
-            <button onClick={() => navigate('/login')} className="btn-nav-primary">
-              Login / Sign Up
-            </button>
             <button 
-              className="btn-language" 
-              onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+              onClick={() => navigate('/login')} 
+              className="btn-nav-primary"
             >
-              {language === 'en' ? 'العربية' : 'English'}
+              Start Free Trial
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section with Video Background */}
-      <section className="hero-section">
-        <div className="hero-video-container">
-          <video 
-            className="hero-video" 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            poster="/hero-poster.jpg"
-          >
-            <source src="/hero-video.mp4" type="video/mp4" />
-            {/* Replace /hero-video.mp4 with your Pika-generated video */}
-          </video>
-          <div className="hero-video-overlay"></div>
-        </div>
-
-        <div className="hero-content">
-          <div className="hero-text">
-            <h1 className="hero-title">
-              Start with understanding.
-              <br />
-              <span className="hero-highlight">Prepare with confidence.</span>
-            </h1>
+      {/* ==================== HERO SECTION ==================== */}
+      <section className="hero-institutional">
+        <div className="hero-container">
+          <div className="hero-content">
+            <div className="hero-label">National readiness for</div>
             
-            <p className="hero-description">
-              Dr Fahm is a diagnostic-led assessment and preparation platform for Qudurat, 
-              Tahsili, and NAFS. We help students and institutions move beyond guesswork 
-              through personalised pathways, purposeful practice, and clear indicators of readiness.
+            <div className="rotating-exams">
+              {exams.map((exam, index) => (
+                <h1 
+                  key={exam}
+                  className={`exam-text ${currentExam === index ? 'active' : ''}`}
+                >
+                  {exam}
+                </h1>
+              ))}
+            </div>
+
+            <p className="hero-subheadline">
+              Saudi national assessments now measure readiness over time, 
+              not just performance on a single day.
+            </p>
+
+            <p className="hero-body">
+              Dr Fahm is a diagnostic-led assessment and preparation platform designed 
+              for the Saudi education system. We help students, families, and institutions 
+              gain early clarity on readiness, so preparation becomes intentional rather 
+              than reactive.
             </p>
 
             <div className="hero-ctas">
-              <button onClick={() => navigate('/login')} className="btn-hero-primary">
+              <button 
+                onClick={() => navigate('/login')} 
+                className="btn-cta-primary"
+              >
                 Start Free Trial
+                <span className="btn-microcopy">No payment details required</span>
               </button>
-              <button onClick={() => scrollToSection('for-schools')} className="btn-hero-secondary">
+              
+              <button 
+                onClick={() => scrollToSection('for-schools')} 
+                className="btn-cta-secondary"
+              >
                 For Schools & Organisations
               </button>
             </div>
-
-            <p className="hero-notice">No payment details required.</p>
           </div>
-        </div>
-      </section>
 
-      {/* Trust Statements */}
-      <section className="trust-section">
-        <div className="container">
-          <div className="trust-grid">
-            <div className="trust-item">
-              <div className="trust-icon">📊</div>
-              <h3>Diagnostic-led preparation</h3>
-              <p>Not random practice</p>
-            </div>
-            
-            <div className="trust-item">
-              <div className="trust-icon">🎯</div>
-              <h3>Personalised pathways</h3>
-              <p>For every learner</p>
-            </div>
-            
-            <div className="trust-item">
-              <div className="trust-icon">🇸🇦</div>
-              <h3>Designed for national assessments</h3>
-              <p>Aligned to standards</p>
-            </div>
-            
-            <div className="trust-item">
-              <div className="trust-icon">🏢</div>
-              <h3>Individual and institutional use</h3>
-              <p>Scalable for all</p>
+          <div className="hero-visual">
+            <div className="diagnostic-mockup">
+              <div className="mockup-header">
+                <span className="mockup-title">Readiness Diagnostic</span>
+                <span className="mockup-status">In Progress</span>
+              </div>
+              <div className="mockup-section">
+                <div className="progress-indicator">
+                  <div className="progress-bar" style={{ width: '67%' }}></div>
+                </div>
+                <div className="mockup-metrics">
+                  <div className="metric">
+                    <span className="metric-label">Question Type</span>
+                    <span className="metric-value">Quantitative Reasoning</span>
+                  </div>
+                  <div className="metric">
+                    <span className="metric-label">Time Efficiency</span>
+                    <span className="metric-value">Analyzing...</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How Dr Fahm Works */}
-      <section className="how-it-works-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>How Dr Fahm Works</h2>
-            <p className="section-subtitle">A structured approach to exam readiness</p>
+      {/* ==================== SYSTEM SHIFT ==================== */}
+      <section className="system-shift">
+        <div className="content-container">
+          <h2>The cost of guessing has increased.</h2>
+          
+          <div className="shift-content">
+            <p className="shift-paragraph">
+              Qudurat and Tahsili are no longer isolated milestones.
+            </p>
+            
+            <p className="shift-paragraph">
+              With the introduction of NAFS, readiness is now assessed earlier, 
+              benchmarked more consistently, and discussed more openly.
+            </p>
+            
+            <p className="shift-paragraph">
+              Families who gain clarity early keep their options open. 
+              Families who delay are often forced into rushed decisions later.
+            </p>
+            
+            <p className="shift-conclusion">
+              Dr Fahm exists to move clarity forward.
+            </p>
           </div>
+        </div>
+      </section>
 
-          <div className="steps-grid">
-            <div className="step-card">
+      {/* ==================== PATH SELECTION ==================== */}
+      <section className="path-selection">
+        <div className="content-container">
+          <h2>One platform. Different decisions.</h2>
+
+          <div className="audience-grid">
+            {/* Students Card */}
+            <div 
+              className={`audience-card ${expandedCard === 'students' ? 'expanded' : ''}`}
+              onMouseEnter={() => setExpandedCard('students')}
+              onMouseLeave={() => setExpandedCard(null)}
+            >
+              <div className="card-icon">🎓</div>
+              <h3>Students</h3>
+              <p className="card-primary">
+                If you're practising but still unsure whether it's the right practice, 
+                that's the problem diagnostics solve.
+              </p>
+              
+              <div className="card-expanded-content">
+                <ul className="card-benefits">
+                  <li>Understand what actually matters before time runs out</li>
+                  <li>Practice with purpose, not just volume</li>
+                  <li>Private clarity without public comparison</li>
+                </ul>
+              </div>
+              
+              <button 
+                onClick={() => navigate('/login')} 
+                className="btn-card-action"
+              >
+                Take the Diagnostic
+              </button>
+            </div>
+
+            {/* Parents Card */}
+            <div 
+              className={`audience-card ${expandedCard === 'parents' ? 'expanded' : ''}`}
+              onMouseEnter={() => setExpandedCard('parents')}
+              onMouseLeave={() => setExpandedCard(null)}
+            >
+              <div className="card-icon">👨‍👩‍👧‍👦</div>
+              <h3>Parents</h3>
+              <p className="card-primary">
+                If you're unsure where your child truly stands, delaying clarity 
+                rarely reduces stress.
+              </p>
+              
+              <div className="card-expanded-content">
+                <ul className="card-benefits">
+                  <li>Early visibility without pressure or rankings</li>
+                  <li>Understand readiness before decisions become urgent</li>
+                  <li>Support preparation with actual insight</li>
+                </ul>
+              </div>
+              
+              <button 
+                onClick={() => navigate('/login')} 
+                className="btn-card-action"
+              >
+                Start Free Trial
+              </button>
+            </div>
+
+            {/* Schools Card */}
+            <div 
+              className={`audience-card ${expandedCard === 'schools' ? 'expanded' : ''}`}
+              onMouseEnter={() => setExpandedCard('schools')}
+              onMouseLeave={() => setExpandedCard(null)}
+            >
+              <div className="card-icon">🏫</div>
+              <h3>Schools & Organisations</h3>
+              <p className="card-primary">
+                If readiness is becoming a parent conversation, it needs to become a system.
+              </p>
+              
+              <div className="card-expanded-content">
+                <ul className="card-benefits">
+                  <li>Cohort-level diagnostic insight and reporting</li>
+                  <li>Consistent preparation framework across year groups</li>
+                  <li>Minimal operational burden, maximum visibility</li>
+                </ul>
+              </div>
+              
+              <button 
+                onClick={() => scrollToSection('for-schools')} 
+                className="btn-card-action"
+              >
+                Explore School Access
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== HOW DR FAHM WORKS ==================== */}
+      <section className="how-it-works">
+        <div className="content-container">
+          <h2>Clarity before effort.</h2>
+
+          <div className="steps-horizontal">
+            <div className="step-item">
               <div className="step-number">1</div>
               <h3>Diagnostic Assessment</h3>
               <p>
-                Every learner begins with a diagnostic assessment that identifies strengths, 
-                gaps, reasoning patterns, and time-management behaviours.
+                We identify not just what students get wrong, but why — before time 
+                and confidence are lost.
               </p>
             </div>
 
-            <div className="step-card">
+            <div className="step-connector"></div>
+
+            <div className="step-item">
               <div className="step-number">2</div>
               <h3>Personalised Pathway</h3>
               <p>
-                Dr Fahm builds a focused learning pathway aligned to the learner's needs 
-                and the demands of the assessment.
+                Preparation focuses only on what will meaningfully improve readiness.
               </p>
             </div>
 
-            <div className="step-card">
+            <div className="step-connector"></div>
+
+            <div className="step-item">
               <div className="step-number">3</div>
               <h3>Purposeful Practice</h3>
               <p>
-                Practice is targeted, time-aware, and designed to develop understanding, 
-                accuracy, and confidence under exam conditions.
+                Less volume. More intent. Practice aligned to how assessments 
+                actually decide outcomes.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Who It's For */}
-      <section className="who-its-for-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Who Dr Fahm Is For</h2>
-          </div>
-
-          <div className="audience-grid">
-            {/* Students & Parents */}
-            <div className="audience-card">
-              <div className="audience-icon">🎓</div>
-              <h3>For Students & Parents</h3>
-              
-              <ul className="audience-benefits">
-                <li>A clear starting point through diagnostics</li>
-                <li>Personalised preparation, not generic courses</li>
-                <li>Calm, academic approach that builds confidence</li>
-                <li>Flexible access from home</li>
-              </ul>
-
-              <button onClick={() => navigate('/login')} className="btn-audience">
-                Start Free Trial
-              </button>
-            </div>
-
-            {/* Schools & Organisations */}
-            <div className="audience-card" id="for-schools">
-              <div className="audience-icon">🏫</div>
-              <h3>For Schools & Organisations</h3>
-              
-              <ul className="audience-benefits">
-                <li>Structured assessment aligned to national exams</li>
-                <li>Consistent preparation across cohorts</li>
-                <li>Clear visibility of readiness and progress</li>
-                <li>Scalable implementation</li>
-              </ul>
-
-              <button onClick={() => window.location.href = 'mailto:schools@drfahm.com'} className="btn-audience">
-                Talk to Us About School Access
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Supported Assessments */}
-      <section className="assessments-section">
-        <div className="container">
-          <div className="section-header">
-            <h2>Supported Assessments</h2>
-          </div>
-
-          <div className="assessments-grid">
-            <div className="assessment-card">
-              <h3>Qudurat</h3>
-              <p>
-                Reasoning-focused preparation for quantitative and verbal sections, 
-                with attention to patterns, logic, and time efficiency.
-              </p>
-            </div>
-
-            <div className="assessment-card">
-              <h3>Tahsili</h3>
-              <p>
-                Structured preparation aligned to subject knowledge and assessment design, 
-                without rote revision or over-practice.
-              </p>
-            </div>
-
-            <div className="assessment-card">
-              <h3>NAFS</h3>
-              <p>
-                Readiness assessment and skill development aligned to national standards 
-                and emerging frameworks.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Dr Fahm */}
-      <section className="why-section">
-        <div className="container">
-          <div className="why-content">
-            <h2>Why Dr Fahm</h2>
-            
-            <div className="why-columns">
-              <div className="why-column">
-                <h3>Dr Fahm is not:</h3>
-                <ul className="why-list not-list">
-                  <li>A tutoring centre</li>
-                  <li>A question bank</li>
-                  <li>Volume-based practice</li>
-                  <li>One-size-fits-all courses</li>
-                  <li>Short-term performance hacks</li>
-                </ul>
-              </div>
-
-              <div className="why-column">
-                <h3>Dr Fahm is:</h3>
-                <ul className="why-list is-list">
-                  <li>Diagnostic before training</li>
-                  <li>Personalised with purpose</li>
-                  <li>Focused on readiness, not cramming</li>
-                  <li>Clarity-driven preparation</li>
-                  <li>Built for lasting understanding</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Learning Environment */}
-      <section className="environment-section">
-        <div className="container">
-          <div className="environment-content">
-            <h2>Designed for Serious Learning</h2>
-            
-            <div className="environment-features">
-              <div className="env-feature">
-                <div className="env-icon">🚫</div>
-                <h4>No public leaderboards</h4>
-              </div>
-              
-              <div className="env-feature">
-                <div className="env-icon">🎯</div>
-                <h4>No superficial gamification</h4>
-              </div>
-              
-              <div className="env-feature">
-                <div className="env-icon">✨</div>
-                <h4>No performance pressure</h4>
-              </div>
-            </div>
-
-            <p className="environment-note">
-              Progress is measured against readiness, not against others.
+      {/* ==================== DIFFERENTIATION ==================== */}
+      <section className="differentiation">
+        <div className="content-container-narrow">
+          <h2>Activity can hide confusion. Readiness exposes it.</h2>
+          
+          <div className="differentiation-body">
+            <p>Many students appear busy but remain unprepared.</p>
+            <p>More questions do not always lead to more readiness.</p>
+            <p className="differentiation-conclusion">
+              Dr Fahm replaces activity with insight, so effort produces progress.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="final-cta-section">
-        <div className="container">
-          <div className="final-cta-content">
-            <h2>Start free. Decide later.</h2>
+      {/* ==================== EXAMS SECTION ==================== */}
+      <section className="exams-section">
+        <div className="content-container">
+          <h2>Built for the assessments shaping progression in Saudi Arabia.</h2>
+
+          <div className="exams-grid">
+            <div className="exam-card">
+              <div className="exam-header">
+                <h3>Qudurat</h3>
+                <span className="exam-badge">Reasoning</span>
+              </div>
+              <p>
+                Reasoning accuracy and time control, measured diagnostically. 
+                Not repetition, but understanding of question patterns and 
+                efficient problem-solving under pressure.
+              </p>
+              <button onClick={() => navigate('/login')} className="btn-exam">
+                Check Qudurat Readiness →
+              </button>
+            </div>
+
+            <div className="exam-card">
+              <div className="exam-header">
+                <h3>Tahsili</h3>
+                <span className="exam-badge">Knowledge</span>
+              </div>
+              <p>
+                Structured subject preparation aligned to assessment design, not repetition. 
+                Focused revision that addresses actual gaps in understanding across 
+                curriculum areas.
+              </p>
+              <button onClick={() => navigate('/login')} className="btn-exam">
+                Check Tahsili Readiness →
+              </button>
+            </div>
+
+            <div className="exam-card exam-card-featured">
+              <div className="exam-header">
+                <h3>NAFS</h3>
+                <span className="exam-badge exam-badge-featured">Benchmarking</span>
+              </div>
+              <p>
+                Early readiness signals for a benchmarking-led system. Understanding 
+                where students stand before high-stakes decisions need to be made.
+              </p>
+              <button onClick={() => navigate('/login')} className="btn-exam btn-exam-featured">
+                Check NAFS Readiness →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== STUDENT MIRROR ==================== */}
+      <section className="student-mirror">
+        <div className="content-container-narrow">
+          <h2>If you're avoiding diagnostics, that's understandable. It's also the risk.</h2>
+          
+          <div className="mirror-content">
             <p>
-              Experience how Dr Fahm builds clarity and direction through diagnostic insight.
+              Most capable students delay diagnostics because clarity feels exposing.
             </p>
-
-            <div className="final-cta-buttons">
-              <button onClick={() => navigate('/login')} className="btn-final-primary">
-                Start Free Trial
-              </button>
-              <button onClick={() => scrollToSection('for-schools')} className="btn-final-secondary">
-                For Schools & Organisations
-              </button>
-            </div>
-
-            <p className="final-cta-note">
-              Flexible plans available for individuals and institutions.
+            <p>
+              But uncertainty rarely disappears on its own.
             </p>
+            <p className="mirror-conclusion">
+              Dr Fahm gives clarity early, privately, and constructively.
+            </p>
+            
+            <button onClick={() => navigate('/login')} className="btn-mirror">
+              Start Diagnostic Assessment
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="landing-footer">
-        <div className="container">
+      {/* ==================== FOR SCHOOLS ==================== */}
+      <section className="for-schools" id="for-schools">
+        <div className="content-container">
+          <div className="schools-content">
+            <div className="schools-text">
+              <h2>When readiness becomes visible, systems matter.</h2>
+              
+              <p className="schools-intro">
+                As national benchmarking increases, readiness can no longer rely 
+                on individual effort alone.
+              </p>
+              
+              <p>
+                Dr Fahm helps schools implement a consistent readiness framework that 
+                supports students, reassures parents, and reduces last-minute escalation.
+              </p>
+
+              <div className="schools-features">
+                <div className="feature-item">
+                  <div className="feature-check">✓</div>
+                  <span>Cohort-level diagnostic insight</span>
+                </div>
+                <div className="feature-item">
+                  <div className="feature-check">✓</div>
+                  <span>Consistent preparation across year groups</span>
+                </div>
+                <div className="feature-item">
+                  <div className="feature-check">✓</div>
+                  <span>Clear reporting for leadership and parents</span>
+                </div>
+                <div className="feature-item">
+                  <div className="feature-check">✓</div>
+                  <span>Minimal operational burden</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => window.location.href = 'mailto:schools@drfahm.com'} 
+                className="btn-schools"
+              >
+                Talk to us about school access
+              </button>
+            </div>
+
+            <div className="schools-visual">
+              <div className="dashboard-mockup">
+                <div className="mockup-title">School Dashboard</div>
+                <div className="mockup-stats">
+                  <div className="stat-item">
+                    <span className="stat-number">156</span>
+                    <span className="stat-label">Students Assessed</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-number">78%</span>
+                    <span className="stat-label">Average Readiness</span>
+                  </div>
+                </div>
+                <div className="mockup-chart">
+                  <div className="chart-bar" style={{ height: '45%' }}></div>
+                  <div className="chart-bar" style={{ height: '68%' }}></div>
+                  <div className="chart-bar" style={{ height: '82%' }}></div>
+                  <div className="chart-bar" style={{ height: '78%' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== FINAL CTA ==================== */}
+      <section className="final-cta">
+        <div className="content-container">
+          <h2>Clarity earlier. Fewer compromises later.</h2>
+          <p className="final-cta-body">
+            Start with a diagnostic assessment and understand readiness before 
+            decisions become urgent.
+          </p>
+
+          <div className="final-cta-actions">
+            <button 
+              onClick={() => navigate('/login')} 
+              className="btn-final-primary"
+            >
+              Start Free Trial
+              <span className="btn-microcopy-inline">No payment details required</span>
+            </button>
+            
+            <button 
+              onClick={() => scrollToSection('for-schools')} 
+              className="btn-final-secondary"
+            >
+              For Schools & Organisations
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== FOOTER ==================== */}
+      <footer className="footer-institutional">
+        <div className="footer-container">
           <div className="footer-grid">
             <div className="footer-brand">
               <h3>Dr Fahm</h3>
               <p>National Assessment & Readiness Platform</p>
+              <p className="footer-tagline">
+                Designed for the Saudi education system. Built for clarity and readiness.
+              </p>
             </div>
 
             <div className="footer-links">
@@ -344,7 +496,7 @@ function HomePage() {
             <div className="footer-links">
               <h4>Platform</h4>
               <ul>
-                <li><a href="#for-schools" onClick={() => scrollToSection('for-schools')}>For Schools</a></li>
+                <li><a href="#for-schools" onClick={(e) => { e.preventDefault(); scrollToSection('for-schools'); }}>For Schools</a></li>
                 <li><a href="#about">About Dr Fahm</a></li>
                 <li><a href="mailto:info@drfahm.com">Contact</a></li>
               </ul>
@@ -361,14 +513,10 @@ function HomePage() {
 
           <div className="footer-bottom">
             <p>&copy; 2025 Dr Fahm. All rights reserved.</p>
-            <div className="footer-language">
-              <button onClick={() => setLanguage('en')} className={language === 'en' ? 'active' : ''}>
-                English
-              </button>
-              <span>|</span>
-              <button onClick={() => setLanguage('ar')} className={language === 'ar' ? 'active' : ''}>
-                العربية
-              </button>
+            <div className="footer-meta">
+              <span>Built for Saudi Arabia</span>
+              <span className="footer-separator">•</span>
+              <span>Aligned with Vision 2030</span>
             </div>
           </div>
         </div>
