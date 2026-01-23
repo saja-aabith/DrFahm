@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Database, Type, Zap, Route } from 'lucide-react';
 import './HomePage.css';
 
 function HomePage() {
@@ -104,9 +105,9 @@ function HomePage() {
         <div className="hero-container">
           <div className="hero-content">
             <h1 className="hero-headline">
-              The proven blueprint to achieve {' '}
+              The proven blueprint to{' '}
               <span className="percentage-animated">{percentage}%</span>{' '}
-               in{' '}
+              in{' '}
               <span className="rotating-exam">
                 {exams.map((exam, index) => (
                   <span 
@@ -151,13 +152,15 @@ function HomePage() {
                 </button>
               </div>
               
-              <button 
-                onClick={() => scrollToSection('for-schools')} 
-                className="btn-hero-secondary"
-              >
-                For Schools
-              </button>
-              <span className="btn-microcopy">Cohort rollout, leaderboards, and progress insights.</span>
+              <div className="hero-secondary-cta">
+                <button 
+                  onClick={() => scrollToSection('for-schools')} 
+                  className="btn-hero-secondary"
+                >
+                  For Schools
+                </button>
+                <span className="btn-microcopy">Cohort rollout, leaderboards, and progress insights.</span>
+              </div>
             </div>
           </div>
 
@@ -390,6 +393,9 @@ function HomePage() {
               onMouseEnter={() => setHoveredUSP('bank')}
               onMouseLeave={() => setHoveredUSP(null)}
             >
+              <div className="usp-icon">
+                <Database size={26} strokeWidth={2.5} />
+              </div>
               <h3>Bigger question bank</h3>
               <p>More depth than print resources.</p>
               {hoveredUSP === 'bank' && (
@@ -402,6 +408,9 @@ function HomePage() {
               onMouseEnter={() => setHoveredUSP('bilingual')}
               onMouseLeave={() => setHoveredUSP(null)}
             >
+              <div className="usp-icon">
+                <Type size={26} strokeWidth={2.5} />
+              </div>
               <h3>Arabic and English</h3>
               <p>Prepare in the language you need.</p>
               {hoveredUSP === 'bilingual' && (
@@ -414,6 +423,9 @@ function HomePage() {
               onMouseEnter={() => setHoveredUSP('feedback')}
               onMouseLeave={() => setHoveredUSP(null)}
             >
+              <div className="usp-icon">
+                <Zap size={28} strokeWidth={2.5} />
+              </div>
               <h3>Instant feedback</h3>
               <p>Every question teaches.</p>
               {hoveredUSP === 'feedback' && (
@@ -426,6 +438,9 @@ function HomePage() {
               onMouseEnter={() => setHoveredUSP('progression')}
               onMouseLeave={() => setHoveredUSP(null)}
             >
+              <div className="usp-icon">
+                <Route size={28} strokeWidth={2.5} />
+              </div>
               <h3>Structured progression</h3>
               <p>No guessing what to do next.</p>
               {hoveredUSP === 'progression' && (
