@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Database, Type, Zap, Route } from 'lucide-react';
+import { Database, Type, Zap, Route, Globe, Target } from 'lucide-react';
+import MiniDemo from './MiniDemo';
 import './HomePage.css';
 
 function HomePage() {
@@ -9,7 +10,14 @@ function HomePage() {
   const [navScrolled, setNavScrolled] = useState(false);
   const [hoveredUSP, setHoveredUSP] = useState(null);
   const [percentage, setPercentage] = useState(0);
+  const [currentBenefit, setCurrentBenefit] = useState(0);
   const exams = ['NAFS', 'Qudurat', 'Tahsili'];
+  
+  const benefits = [
+    'Clear progression',
+    'Immediate feedback',
+    'Built for Saudi students and schools'
+  ];
 
   // Navbar scroll effect
   useEffect(() => {
@@ -49,11 +57,23 @@ function HomePage() {
     return () => clearInterval(interval);
   }, [exams.length]);
 
+  // Rotating benefits animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBenefit((prev) => (prev + 1) % benefits.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [benefits.length]);
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleDemoComplete = () => {
+    navigate('/start');
   };
 
   return (
@@ -66,9 +86,6 @@ function HomePage() {
           </div>
           
           <div className="nav-center">
-            <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection('how-it-works'); }}>
-              How it works
-            </a>
             <a href="#qudurat" onClick={(e) => { e.preventDefault(); scrollToSection('exams-section'); }}>
               Qudurat
             </a>
@@ -78,6 +95,9 @@ function HomePage() {
             <a href="#nafs" onClick={(e) => { e.preventDefault(); scrollToSection('exams-section'); }}>
               NAFS
             </a>
+            <a href="/pricing">
+              Pricing
+            </a>
             <a href="#for-schools" onClick={(e) => { e.preventDefault(); scrollToSection('for-schools'); }}>
               For Schools
             </a>
@@ -85,7 +105,7 @@ function HomePage() {
           
           <div className="nav-actions">
             <button 
-              onClick={() => navigate('/login')} 
+              onClick={() => navigate('/start')} 
               className="btn-nav-primary"
             >
               Start Free Practice
@@ -121,97 +141,40 @@ function HomePage() {
             </h1>
 
             <p className="hero-subheadline">
-              Dr Fahm is a bilingual (Arabic and English) mastery platform built to 
-              replace books, crash courses, and Telegram searching, with structured 
-              practice and instant feedback.
+              Dr Fahm is a bilingual (Arabic and English) mastery platform with structured 
+              practice, clear progression, and instant feedback—built for Saudi students and schools.
             </p>
 
-            <p className="hero-supporting">
-              Clear progression. Immediate feedback. Built for Saudi students and schools.
-            </p>
+            <div className="hero-supporting-animated">
+              {benefits.map((benefit, index) => (
+                <span 
+                  key={benefit}
+                  className={`benefit-item ${currentBenefit === index ? 'active' : ''}`}
+                >
+                  {benefit}
+                </span>
+              ))}
+            </div>
 
-            <div className="hero-ctas">
-              <div className="hero-exam-buttons">
-                <button 
-                  onClick={() => navigate('/login')} 
-                  className="btn-exam-hero nafs"
-                >
-                  NAFS
-                </button>
-                <button 
-                  onClick={() => navigate('/login')} 
-                  className="btn-exam-hero"
-                >
-                  Qudurat
-                </button>
-                <button 
-                  onClick={() => navigate('/login')} 
-                  className="btn-exam-hero"
-                >
-                  Tahsili
-                </button>
-              </div>
+            <div className="hero-ctas-new">
+              <button 
+                onClick={() => navigate('/start')} 
+                className="btn-hero-primary"
+              >
+                Start Free Practice
+              </button>
               
-              <div className="hero-secondary-cta">
-                <button 
-                  onClick={() => scrollToSection('for-schools')} 
-                  className="btn-hero-secondary"
-                >
-                  For Schools
-                </button>
-                <span className="btn-microcopy">Cohort rollout, leaderboards, and progress insights.</span>
-              </div>
+              <button 
+                onClick={() => scrollToSection('for-schools')} 
+                className="btn-hero-secondary-new"
+              >
+                For Schools
+              </button>
             </div>
           </div>
 
           <div className="hero-visual">
-            <div className="product-demo">
-              <div className="demo-header">
-                <div className="demo-controls">
-                  <span className="demo-dot red"></span>
-                  <span className="demo-dot yellow"></span>
-                  <span className="demo-dot green"></span>
-                </div>
-                <div className="demo-lang-toggle">
-                  <span className="active">AR</span>
-                  <span>EN</span>
-                </div>
-              </div>
-              
-              <div className="demo-content">
-                <div className="demo-progress">World 3 of 10</div>
-                
-                <div className="demo-question">
-                  <h4>Question 12</h4>
-                  <p>If x + 5 = 12, what is the value of 2x?</p>
-                </div>
-                
-                <div className="demo-answers">
-                  <div className="demo-answer correct">
-                    <span className="answer-letter">A</span>
-                    <span className="answer-text">14</span>
-                    <span className="answer-check">✓</span>
-                  </div>
-                  <div className="demo-answer">
-                    <span className="answer-letter">B</span>
-                    <span className="answer-text">10</span>
-                  </div>
-                  <div className="demo-answer">
-                    <span className="answer-letter">C</span>
-                    <span className="answer-text">7</span>
-                  </div>
-                  <div className="demo-answer">
-                    <span className="answer-letter">D</span>
-                    <span className="answer-text">12</span>
-                  </div>
-                </div>
-                
-                <div className="demo-feedback">
-                  <div className="feedback-badge">Correct!</div>
-                  <p>You correctly solved for x first, then multiplied by 2.</p>
-                </div>
-              </div>
-            </div>
+            <MiniDemo onComplete={handleDemoComplete} />
           </div>
         </div>
       </section>
@@ -219,202 +182,169 @@ function HomePage() {
       {/* ==================== 3) TRUST STRIP ==================== */}
       <section className="trust-strip">
         <div className="content-container">
-          <div className="trust-grid">
-            <div className="trust-pillar">
-              <div className="trust-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3m18 0c0-1.66-4-3-9-3s-9 1.34-9 3m18 0v6c0 1.66-4 3-9 3s-9-1.34-9-3v-6"/>
-                </svg>
+          <p className="trust-statement">
+            Preparing <strong>Saudi students</strong> for{' '}
+            <strong>NAFS</strong>, <strong>Qudurat</strong>, and <strong>Tahsili</strong>.
+          </p>
+        </div>
+      </section>
+
+      {/* ==================== 4) VALUE PROPS - ENHANCED ==================== */}
+      <section className="value-props-enhanced" id="exams-section">
+        <div className="content-container">
+          <h2 className="section-title-enhanced">Why students choose Dr Fahm</h2>
+          
+          <div className="value-grid-enhanced">
+            <div className="value-card-enhanced featured">
+              <div className="value-icon-large">
+                <Globe size={40} strokeWidth={2} />
               </div>
-              <p><strong>Bilingual:</strong> Arabic and English in one platform</p>
+              <h3>Bilingual (Arabic + English)</h3>
+              <p>Practice in your preferred language. Switch anytime.</p>
             </div>
-            
-            <div className="trust-pillar">
-              <div className="trust-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+
+            <div className="value-card-enhanced">
+              <div className="value-icon-large">
+                <Target size={36} strokeWidth={2} />
               </div>
-              <p><strong>Mastery-based:</strong> Progress only when you earn it</p>
+              <h3>Mastery-based progression</h3>
+              <p>Move forward only after understanding. No gaps.</p>
             </div>
-            
-            <div className="trust-pillar">
-              <div className="trust-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
+
+            <div className="value-card-enhanced">
+              <div className="value-icon-large">
+                <Zap size={36} strokeWidth={2} />
               </div>
-              <p><strong>Instant feedback:</strong> Learn with every question</p>
+              <h3>Instant feedback</h3>
+              <p>Learn from every mistake immediately.</p>
             </div>
-            
-            <div className="trust-pillar">
-              <div className="trust-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                </svg>
+
+            <div className="value-card-enhanced">
+              <div className="value-icon-large">
+                <Route size={36} strokeWidth={2} />
               </div>
-              <p><strong>Built for KSA:</strong> Qudurat, Tahsili and NAFS</p>
+              <h3>Built for KSA</h3>
+              <p>Aligned with Saudi national assessments.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ==================== 4) THE PROBLEM ==================== */}
+      {/* ==================== 5) THE PROBLEM ==================== */}
       <section className="the-problem">
         <div className="content-container">
-          <h2>This is how most students prepare today.</h2>
+          <h2 className="manifesto-headline">
+            Hard work is common. Clear mastery is not.
+          </h2>
 
-          <div className="problem-grid">
-            <div className="problem-card">
-              <h3>Books only</h3>
-              <p>No feedback, no structure, no visibility on progress.</p>
+          <div className="problem-grid-enhanced">
+            <div className="problem-card-enhanced">
+              <h3>Scattered questions</h3>
+              <p>Students search endlessly for practice material across Telegram, books, and videos.</p>
             </div>
 
-            <div className="problem-card">
-              <h3>Telegram hunting</h3>
-              <p>Questions are scattered and inconsistent.</p>
+            <div className="problem-card-enhanced">
+              <h3>No feedback loop</h3>
+              <p>Mistakes are left unresolved. Students repeat errors without understanding why.</p>
             </div>
 
-            <div className="problem-card">
-              <h3>Crash courses</h3>
-              <p>Short bursts, little retention, no long-term mastery.</p>
+            <div className="problem-card-enhanced">
+              <h3>Guessing next steps</h3>
+              <p>No clear progression. Students waste time wondering what to practice next.</p>
+            </div>
+
+            <div className="problem-card-enhanced">
+              <h3>Last-minute panic</h3>
+              <p>Without structure, preparation becomes cramming instead of building real mastery.</p>
             </div>
           </div>
-
-          <p className="problem-conclusion">Hard work is common. Clear mastery is not.</p>
-          
-          <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection('how-it-works'); }} className="problem-link">
-            See how Dr Fahm works →
-          </a>
         </div>
       </section>
 
-      {/* ==================== 5) HOW IT WORKS ==================== */}
+      {/* ==================== 6) HOW IT WORKS - SIMPLE SYSTEM ==================== */}
       <section className="how-it-works" id="how-it-works">
         <div className="content-container">
           <h2>A simple system that builds mastery.</h2>
 
           <div className="steps-grid">
-            <div className="step-item">
+            <div className="step-card">
               <div className="step-number">1</div>
-              <h3>Practice from a deep question bank</h3>
-              <p>Structured questions, not random sets.</p>
+              <h3>Quick diagnostic</h3>
+              <p>Start with 15 minutes. We identify your strengths and gaps.</p>
             </div>
 
-            <div className="step-item">
+            <div className="step-card">
               <div className="step-number">2</div>
-              <h3>Get instant feedback</h3>
-              <p>Know what's right, what's wrong, and why.</p>
+              <h3>Guided practice</h3>
+              <p>Follow a structured path. Clear next steps. No guessing.</p>
             </div>
 
-            <div className="step-item">
+            <div className="step-card">
               <div className="step-number">3</div>
-              <h3>Master one level at a time</h3>
-              <p>Unlock the next World only when you reach 100 percent.</p>
+              <h3>Build mastery</h3>
+              <p>Master each concept before moving forward. Real understanding, not memorization.</p>
             </div>
           </div>
 
-          <div className="progress-bar-graphic">
-            <div className="progress-segment completed"></div>
-            <div className="progress-segment completed"></div>
-            <div className="progress-segment active"></div>
-            <div className="progress-segment"></div>
-            <div className="progress-segment"></div>
-          </div>
-
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
+          <button onClick={() => navigate('/start')} className="btn-section-cta">
             Start Free Practice
           </button>
         </div>
       </section>
 
-      {/* ==================== 6) WORLDS AND MASTERY ==================== */}
+      {/* ==================== 7) WORLDS MASTERY SYSTEM ==================== */}
       <section className="worlds-mastery">
-        <div className="content-container">
-          <h2>Mastery before progress, always.</h2>
+        <div className="content-container-narrow">
+          <h2>10 worlds. 100 levels. One path to mastery.</h2>
 
-          <p className="worlds-body">
-            Students move through 10 Worlds designed to build skill step by step. 
-            Each World focuses on a specific set of question types. 
-            You advance only when mastery is proven.
+          <p className="worlds-intro">
+            Dr Fahm organises practice across 10 worlds and 100 levels. Each world focuses 
+            on core concepts, building step-by-step toward full readiness.
           </p>
 
           <div className="worlds-features">
             <div className="world-feature">
-              <span className="feature-bullet">→</span>
-              <span>Clear focus in every World</span>
+              <span className="feature-number">10</span>
+              <span className="feature-label">Worlds</span>
             </div>
             <div className="world-feature">
-              <span className="feature-bullet">→</span>
-              <span>Motivation through progress</span>
+              <span className="feature-number">100</span>
+              <span className="feature-label">Levels</span>
             </div>
             <div className="world-feature">
-              <span className="feature-bullet">→</span>
-              <span>Confidence built through mastery</span>
+              <span className="feature-number">2000+</span>
+              <span className="feature-label">Questions</span>
             </div>
           </div>
 
-          <div className="worlds-visual">
-            <div className="world-item locked">
-              <div className="world-number">World 1</div>
-              <div className="world-status">100% Complete</div>
-            </div>
-            <div className="world-item locked">
-              <div className="world-number">World 2</div>
-              <div className="world-status">100% Complete</div>
-            </div>
-            <div className="world-item active">
-              <div className="world-number">World 3</div>
-              <div className="world-status">In Progress - 67%</div>
-            </div>
-            <div className="world-item">
-              <div className="world-number">World 4</div>
-              <div className="world-status">🔒 Locked</div>
-            </div>
-            <div className="world-unlock-message">
-              Next World unlocked at 100%
-            </div>
-          </div>
+          <p className="worlds-cta-text">
+            Consistent practice builds the confidence and skills needed for high performance.
+          </p>
 
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
-            Try the first Worlds free
+          <button onClick={() => navigate('/start')} className="btn-section-cta">
+            Explore the system
           </button>
         </div>
       </section>
 
-      {/* ==================== 7) WHY THIS BEATS BOOKS ==================== */}
+      {/* ==================== 8) BEATS BOOKS - INTEGRATED PEDAGOGY ==================== */}
       <section className="beats-books">
         <div className="content-container">
-          <h2>Everything in books, upgraded for online mastery.</h2>
+          <h2>Beats books, Telegram, and crash courses.</h2>
 
           <div className="usp-grid">
-            <div 
-              className="usp-card"
-              onMouseEnter={() => setHoveredUSP('bank')}
-              onMouseLeave={() => setHoveredUSP(null)}
-            >
-              <div className="usp-icon">
-                <Database size={26} strokeWidth={2.5} />
-              </div>
-              <h3>Bigger question bank</h3>
-              <p>More depth than print resources.</p>
-              {hoveredUSP === 'bank' && (
-                <p className="usp-expanded">Thousands of questions across all exam types, regularly updated.</p>
-              )}
-            </div>
-
             <div 
               className="usp-card"
               onMouseEnter={() => setHoveredUSP('bilingual')}
               onMouseLeave={() => setHoveredUSP(null)}
             >
               <div className="usp-icon">
-                <Type size={26} strokeWidth={2.5} />
+                <Type size={28} strokeWidth={2.5} />
               </div>
-              <h3>Arabic and English</h3>
-              <p>Prepare in the language you need.</p>
+              <h3>Bilingual (Arabic + English)</h3>
+              <p>Practice in either language, built natively, not translated.</p>
               {hoveredUSP === 'bilingual' && (
-                <p className="usp-expanded">Switch between languages instantly, practice in both.</p>
+                <p className="usp-expanded">Switch between Arabic and English at any time. Both interfaces are native, not machine-translated.</p>
               )}
             </div>
 
@@ -427,9 +357,24 @@ function HomePage() {
                 <Zap size={28} strokeWidth={2.5} />
               </div>
               <h3>Instant feedback</h3>
-              <p>Every question teaches.</p>
+              <p>Learn from mistakes immediately. Practice designed to stick.</p>
               {hoveredUSP === 'feedback' && (
-                <p className="usp-expanded">Immediate explanations help you understand mistakes before moving on.</p>
+                <p className="usp-expanded">Every answer provides immediate feedback. Mistakes return until fixed. Key concepts reappear to strengthen retention.</p>
+              )}
+            </div>
+
+            <div 
+              className="usp-card"
+              onMouseEnter={() => setHoveredUSP('content')}
+              onMouseLeave={() => setHoveredUSP(null)}
+            >
+              <div className="usp-icon">
+                <Database size={28} strokeWidth={2.5} />
+              </div>
+              <h3>Real exam content</h3>
+              <p>Aligned with Saudi assessments.</p>
+              {hoveredUSP === 'content' && (
+                <p className="usp-expanded">Thousands of questions designed to match official exam patterns and difficulty.</p>
               )}
             </div>
 
@@ -444,7 +389,7 @@ function HomePage() {
               <h3>Structured progression</h3>
               <p>No guessing what to do next.</p>
               {hoveredUSP === 'progression' && (
-                <p className="usp-expanded">Clear pathways through content, building from fundamentals to advanced.</p>
+                <p className="usp-expanded">Clear pathways through content, building from fundamentals to advanced. Adaptive practice ensures optimal difficulty.</p>
               )}
             </div>
           </div>
@@ -452,79 +397,53 @@ function HomePage() {
           <p className="beats-books-conclusion">
             This level of structured online practice does not currently exist in one place.
           </p>
-
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
-            Start Free Practice
-          </button>
         </div>
       </section>
 
-      {/* ==================== 8) PERSONALISED LEARNING ==================== */}
-      <section className="personalised-learning">
-        <div className="content-container-narrow">
-          <h2>Practice designed to stick.</h2>
-
-          <p className="learning-body">
-            Dr Fahm adapts practice to help students retain what they learn, 
-            not just finish questions.
-          </p>
-
-          <div className="learning-features">
-            <div className="learning-feature">
-              <span className="feature-icon">↻</span>
-              <span>Mistakes return until they're fixed</span>
-            </div>
-            <div className="learning-feature">
-              <span className="feature-icon">📌</span>
-              <span>Key ideas come back later so they're remembered</span>
-            </div>
-            <div className="learning-feature">
-              <span className="feature-icon">⚡</span>
-              <span>Practice builds both speed and accuracy</span>
-            </div>
-          </div>
-
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
-            Start Free Practice
-          </button>
-        </div>
-      </section>
-
-      {/* ==================== 9) FOR SCHOOLS (B2B) ==================== */}
-      <section className="for-schools" id="for-schools">
+      {/* ==================== 9) FOR SCHOOLS (B2B) - ENHANCED ==================== */}
+      <section className="for-schools-enhanced" id="for-schools">
         <div className="content-container">
           <h2>For schools: structured practice at scale.</h2>
 
-          <p className="schools-intro">
+          <p className="schools-intro-enhanced">
             NAFS and university readiness are becoming more visible. Schools need a 
             system that supports practice and progress without adding workload.
           </p>
 
-          <div className="schools-grid">
-            <div className="school-feature">
+          <div className="schools-grid-enhanced">
+            <div className="school-card-enhanced">
+              <div className="school-icon">
+                <Target size={32} strokeWidth={2.5} />
+              </div>
               <h3>School leaderboards</h3>
-              <p>Motivation and momentum inside your cohort.</p>
+              <p>Healthy competition drives engagement. Real-time rankings and achievement badges motivate students to practice consistently and push for mastery.</p>
             </div>
 
-            <div className="school-feature">
+            <div className="school-card-enhanced">
+              <div className="school-icon">
+                <Database size={32} strokeWidth={2.5} />
+              </div>
               <h3>Progress and mastery insights</h3>
-              <p>Visibility by class, year group, or cohort.</p>
+              <p>Visibility by class, year group, or cohort. Track student progress with detailed analytics.</p>
             </div>
 
-            <div className="school-feature">
+            <div className="school-card-enhanced">
+              <div className="school-icon">
+                <Route size={32} strokeWidth={2.5} />
+              </div>
               <h3>Flexible rollout</h3>
-              <p>School licences or endorsed home use when budgets are tight.</p>
+              <p>School licences or endorsed home use when budgets are tight. Multiple deployment options.</p>
             </div>
           </div>
 
-          <div className="schools-ctas">
+          <div className="schools-ctas-enhanced">
             <button 
               onClick={() => window.location.href = 'mailto:schools@drfahm.com'} 
-              className="btn-schools-primary"
+              className="btn-schools-primary-enhanced"
             >
               Request School Pilot
             </button>
-            <a href="/schools" className="schools-link">Explore school access →</a>
+            <a href="/schools" className="schools-link-enhanced">Explore school access →</a>
           </div>
         </div>
       </section>
@@ -535,7 +454,7 @@ function HomePage() {
           <h2>The stakes are real. Preparation should be too.</h2>
 
           <div className="stakes-grid">
-            <div className="stake-block">
+            <div className="stake-block-enhanced">
               <h3>University entrance</h3>
               <p>
                 Qudurat and Tahsili remain central for many university pathways. 
@@ -543,7 +462,7 @@ function HomePage() {
               </p>
             </div>
 
-            <div className="stake-block">
+            <div className="stake-block-enhanced">
               <h3>School accountability</h3>
               <p>
                 NAFS is raising expectations. Schools and families benefit when 
@@ -553,10 +472,10 @@ function HomePage() {
           </div>
 
           <div className="stakes-ctas">
-            <button onClick={() => navigate('/login')} className="btn-stake">
-              Start Free Practice
+            <button onClick={() => navigate('/start')} className="btn-stake-primary">
+              Get Started
             </button>
-            <button onClick={() => scrollToSection('for-schools')} className="btn-stake">
+            <button onClick={() => scrollToSection('for-schools')} className="btn-stake-secondary">
               For Schools
             </button>
           </div>
@@ -569,19 +488,19 @@ function HomePage() {
           <h2>Stop searching for questions. Start mastering them.</h2>
 
           <div className="cta-boxes">
-            <div className="cta-box">
+            <div className="cta-box-enhanced">
               <h3>Students and Parents</h3>
-              <button onClick={() => navigate('/login')} className="btn-cta-box">
-                Start Free Practice
+              <button onClick={() => navigate('/start')} className="btn-cta-box-enhanced">
+                Get Started
               </button>
               <span className="cta-box-microcopy">Begin in under a minute.</span>
             </div>
 
-            <div className="cta-box">
+            <div className="cta-box-enhanced">
               <h3>Schools and Organisations</h3>
               <button 
                 onClick={() => window.location.href = 'mailto:schools@drfahm.com'} 
-                className="btn-cta-box"
+                className="btn-cta-box-enhanced schools"
               >
                 Request School Pilot
               </button>
