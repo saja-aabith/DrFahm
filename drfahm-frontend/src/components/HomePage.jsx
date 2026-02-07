@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Database, Type, Zap, Route } from 'lucide-react';
+import InteractiveHeroDemo from './InteractiveHeroDemo';
 import './HomePage.css';
 
 function HomePage() {
@@ -20,7 +21,7 @@ function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animated percentage counter - races to 100%
+  // Animated percentage counter
   useEffect(() => {
     const duration = 1200;
     const steps = 100;
@@ -58,7 +59,7 @@ function HomePage() {
 
   return (
     <div className="homepage-new">
-      {/* ==================== 1) STICKY NAVIGATION ==================== */}
+      {/* ==================== NAVIGATION - UPDATED ==================== */}
       <nav className={`nav-institutional ${navScrolled ? 'scrolled' : ''}`}>
         <div className="nav-container">
           <div className="nav-brand">
@@ -66,41 +67,32 @@ function HomePage() {
           </div>
           
           <div className="nav-center">
-            <a href="#how-it-works" onClick={(e) => { e.preventDefault(); scrollToSection('how-it-works'); }}>
-              How it works
+            <a href="/student" onClick={(e) => { e.preventDefault(); navigate('/student'); }}>
+              I'm a student
             </a>
-            <a href="#qudurat" onClick={(e) => { e.preventDefault(); scrollToSection('exams-section'); }}>
-              Qudurat
+            <a href="/parent" onClick={(e) => { e.preventDefault(); navigate('/parent'); }}>
+              I'm a Parent
             </a>
-            <a href="#tahsili" onClick={(e) => { e.preventDefault(); scrollToSection('exams-section'); }}>
-              Tahsili
+            <a href="/schools" onClick={(e) => { e.preventDefault(); navigate('/schools'); }}>
+              We're a school
             </a>
-            <a href="#nafs" onClick={(e) => { e.preventDefault(); scrollToSection('exams-section'); }}>
-              NAFS
-            </a>
-            <a href="#for-schools" onClick={(e) => { e.preventDefault(); scrollToSection('for-schools'); }}>
-              For Schools
+            <a href="/pricing" onClick={(e) => { e.preventDefault(); navigate('/pricing'); }}>
+              Pricing
             </a>
           </div>
           
           <div className="nav-actions">
             <button 
               onClick={() => navigate('/login')} 
-              className="btn-nav-primary"
-            >
-              Start Free Practice
-            </button>
-            <button 
-              onClick={() => navigate('/login')} 
               className="btn-nav-text"
             >
-              Log in
+              Login / Sign Up
             </button>
           </div>
         </div>
       </nav>
 
-      {/* ==================== 2) HERO - ABOVE THE FOLD ==================== */}
+      {/* ==================== HERO - UPDATED ==================== */}
       <section className="hero-institutional">
         <div className="hero-container">
           <div className="hero-content">
@@ -130,93 +122,24 @@ function HomePage() {
               Clear progression. Immediate feedback. Built for Saudi students and schools.
             </p>
 
+            {/* UPDATED: Single CTA Button */}
             <div className="hero-ctas">
-              <div className="hero-exam-buttons">
-                <button 
-                  onClick={() => navigate('/login')} 
-                  className="btn-exam-hero nafs"
-                >
-                  NAFS
-                </button>
-                <button 
-                  onClick={() => navigate('/login')} 
-                  className="btn-exam-hero"
-                >
-                  Qudurat
-                </button>
-                <button 
-                  onClick={() => navigate('/login')} 
-                  className="btn-exam-hero"
-                >
-                  Tahsili
-                </button>
-              </div>
-              
-              <div className="hero-secondary-cta">
-                <button 
-                  onClick={() => scrollToSection('for-schools')} 
-                  className="btn-hero-secondary"
-                >
-                  For Schools
-                </button>
-                <span className="btn-microcopy">Cohort rollout, leaderboards, and progress insights.</span>
-              </div>
+              <button 
+                onClick={() => navigate('/start')} 
+                className="btn-hero-primary-large"
+              >
+                Get Started Now
+              </button>
             </div>
           </div>
 
           <div className="hero-visual">
-            <div className="product-demo">
-              <div className="demo-header">
-                <div className="demo-controls">
-                  <span className="demo-dot red"></span>
-                  <span className="demo-dot yellow"></span>
-                  <span className="demo-dot green"></span>
-                </div>
-                <div className="demo-lang-toggle">
-                  <span className="active">AR</span>
-                  <span>EN</span>
-                </div>
-              </div>
-              
-              <div className="demo-content">
-                <div className="demo-progress">World 3 of 10</div>
-                
-                <div className="demo-question">
-                  <h4>Question 12</h4>
-                  <p>If x + 5 = 12, what is the value of 2x?</p>
-                </div>
-                
-                <div className="demo-answers">
-                  <div className="demo-answer correct">
-                    <span className="answer-letter">A</span>
-                    <span className="answer-text">14</span>
-                    <span className="answer-check">✓</span>
-                  </div>
-                  <div className="demo-answer">
-                    <span className="answer-letter">B</span>
-                    <span className="answer-text">10</span>
-                  </div>
-                  <div className="demo-answer">
-                    <span className="answer-letter">C</span>
-                    <span className="answer-text">7</span>
-                  </div>
-                  <div className="demo-answer">
-                    <span className="answer-letter">D</span>
-                    <span className="answer-text">12</span>
-                  </div>
-                </div>
-                
-                <div className="demo-feedback">
-                  <div className="feedback-badge">Correct!</div>
-                  <p>You correctly solved for x first, then multiplied by 2.</p>
-                </div>
-              </div>
-            </div>
+            <InteractiveHeroDemo />
           </div>
         </div>
       </section>
 
-      {/* ==================== 3) TRUST STRIP ==================== */}
+      {/* ==================== REST OF HOMEPAGE (unchanged) ==================== */}
       <section className="trust-strip">
         <div className="content-container">
           <div className="trust-grid">
@@ -259,7 +182,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ==================== 4) THE PROBLEM ==================== */}
       <section className="the-problem">
         <div className="content-container">
           <h2>This is how most students prepare today.</h2>
@@ -289,7 +211,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ==================== 5) HOW IT WORKS ==================== */}
       <section className="how-it-works" id="how-it-works">
         <div className="content-container">
           <h2>A simple system that builds mastery.</h2>
@@ -322,13 +243,12 @@ function HomePage() {
             <div className="progress-segment"></div>
           </div>
 
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
-            Start Free Practice
+          <button onClick={() => navigate('/start')} className="btn-section-cta">
+            Get Started Now
           </button>
         </div>
       </section>
 
-      {/* ==================== 6) WORLDS AND MASTERY ==================== */}
       <section className="worlds-mastery">
         <div className="content-container">
           <h2>Mastery before progress, always.</h2>
@@ -369,20 +289,19 @@ function HomePage() {
             </div>
             <div className="world-item">
               <div className="world-number">World 4</div>
-              <div className="world-status">🔒 Locked</div>
+              <div className="world-status">Locked</div>
             </div>
             <div className="world-unlock-message">
               Next World unlocked at 100%
             </div>
           </div>
 
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
+          <button onClick={() => navigate('/start')} className="btn-section-cta">
             Try the first Worlds free
           </button>
         </div>
       </section>
 
-      {/* ==================== 7) WHY THIS BEATS BOOKS ==================== */}
       <section className="beats-books">
         <div className="content-container">
           <h2>Everything in books, upgraded for online mastery.</h2>
@@ -453,13 +372,12 @@ function HomePage() {
             This level of structured online practice does not currently exist in one place.
           </p>
 
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
-            Start Free Practice
+          <button onClick={() => navigate('/start')} className="btn-section-cta">
+            Get Started Now
           </button>
         </div>
       </section>
 
-      {/* ==================== 8) PERSONALISED LEARNING ==================== */}
       <section className="personalised-learning">
         <div className="content-container-narrow">
           <h2>Practice designed to stick.</h2>
@@ -475,22 +393,21 @@ function HomePage() {
               <span>Mistakes return until they're fixed</span>
             </div>
             <div className="learning-feature">
-              <span className="feature-icon">📌</span>
+              <span className="feature-icon">✓</span>
               <span>Key ideas come back later so they're remembered</span>
             </div>
             <div className="learning-feature">
-              <span className="feature-icon">⚡</span>
+              <span className="feature-icon">→</span>
               <span>Practice builds both speed and accuracy</span>
             </div>
           </div>
 
-          <button onClick={() => navigate('/login')} className="btn-section-cta">
-            Start Free Practice
+          <button onClick={() => navigate('/start')} className="btn-section-cta">
+            Get Started Now
           </button>
         </div>
       </section>
 
-      {/* ==================== 9) FOR SCHOOLS (B2B) ==================== */}
       <section className="for-schools" id="for-schools">
         <div className="content-container">
           <h2>For schools: structured practice at scale.</h2>
@@ -503,7 +420,7 @@ function HomePage() {
           <div className="schools-grid">
             <div className="school-feature">
               <h3>School leaderboards</h3>
-              <p>Motivation and momentum inside your cohort.</p>
+              <p>Healthy competition drives engagement. Real-time rankings and achievement badges motivate students to practice consistently and push for mastery.</p>
             </div>
 
             <div className="school-feature">
@@ -529,7 +446,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ==================== 10) STAKES ==================== */}
       <section className="stakes">
         <div className="content-container">
           <h2>The stakes are real. Preparation should be too.</h2>
@@ -553,8 +469,8 @@ function HomePage() {
           </div>
 
           <div className="stakes-ctas">
-            <button onClick={() => navigate('/login')} className="btn-stake">
-              Start Free Practice
+            <button onClick={() => navigate('/start')} className="btn-stake">
+              Get Started Now
             </button>
             <button onClick={() => scrollToSection('for-schools')} className="btn-stake">
               For Schools
@@ -563,7 +479,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ==================== 11) FINAL CTA WALL ==================== */}
       <section className="final-cta-wall">
         <div className="content-container">
           <h2>Stop searching for questions. Start mastering them.</h2>
@@ -571,8 +486,8 @@ function HomePage() {
           <div className="cta-boxes">
             <div className="cta-box">
               <h3>Students and Parents</h3>
-              <button onClick={() => navigate('/login')} className="btn-cta-box">
-                Start Free Practice
+              <button onClick={() => navigate('/start')} className="btn-cta-box">
+                Get Started Now
               </button>
               <span className="cta-box-microcopy">Begin in under a minute.</span>
             </div>
@@ -591,7 +506,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* ==================== FOOTER ==================== */}
       <footer className="footer-institutional">
         <div className="footer-container">
           <div className="footer-grid">

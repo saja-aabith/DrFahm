@@ -18,6 +18,8 @@ import PricingPage from './components/PricingPage';
 import FAQPage from './components/FAQPage';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
+import StudentPage from './components/StudentPage';
+import ParentPage from './components/ParentPage';
 
 // Application Pages
 import LoginPage from './components/LoginPage';
@@ -135,6 +137,8 @@ function App() {
           {/* Marketing Pages - Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/start" element={<StartPage />} />
+          <Route path="/student" element={<StudentPage />} />
+          <Route path="/parent" element={<ParentPage />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           
           {/* Exam-Specific Pages */}
