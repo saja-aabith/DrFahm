@@ -319,8 +319,7 @@ function QuduratPage() {
               <div style={{ fontSize: '40px', marginBottom: '16px' }}>👨‍👩‍👧‍👦</div>
               <h3>For Parents</h3>
               <p>
-                If your child is "working hard" but results aren't improving, activity isn't the same 
-                as readiness. Diagnostics reveal whether preparation is aligned with what Qudurat measures.
+                If your child is "working hard" but results aren't improving, then your child is missing the blueprint
               </p>
             </div>
           </div>
