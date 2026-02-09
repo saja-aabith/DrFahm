@@ -10,14 +10,12 @@ import os
 app = Flask(__name__)
 
 # Configuration
-app.config['SECRET_KEY'] = 'drfahm-super-secret-key-2025'
-app.config['JWT_SECRET_KEY'] = 'jwt-drfahm-secret-2025'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'dev')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
-app.config['JWT_TOKEN_LOCATION'] = ['headers']
-app.config['JWT_HEADER_NAME'] = 'Authorization'
-app.config['JWT_HEADER_TYPE'] = 'Bearer'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 # Initialize CORS with explicit configuration
 CORS(app, resources={

@@ -1,9 +1,126 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './marketing.css';
 
 function ParentPage() {
   const navigate = useNavigate();
+  const [showCTA, setShowCTA] = useState(false);
+  const [selectedExam, setSelectedExam] = useState(null);
+  const [formData, setFormData] = useState({
+    parentName: '',
+    parentEmail: '',
+    studentName: '',
+    studentSchool: '',
+    studentEmail: '',
+    accessDuration: '7days'
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+
+  const examInfo = [
+    {
+      id: 'nafs_g3',
+      title: 'NAFS Grade 3',
+      summary: 'The National Assessment of Fundamental Skills (NAFS) for Grade 3 evaluates foundational literacy and numeracy skills critical for early academic development.',
+      content: 'Covers basic reading comprehension, mathematical operations (addition, subtraction), and problem-solving skills appropriate for 3rd graders.',
+      structure: 'Multiple-choice questions assessing reading, writing, and basic mathematics. Typically administered in Arabic with age-appropriate question formats.',
+      link: 'https://etec.gov.sa/en/programs/nafs'
+    },
+    {
+      id: 'nafs_g6',
+      title: 'NAFS Grade 6',
+      summary: 'NAFS for Grade 6 measures intermediate academic skills in language and mathematics, ensuring students are progressing appropriately through primary education.',
+      content: 'Includes reading comprehension, writing skills, mathematical reasoning (fractions, decimals, basic geometry), and critical thinking.',
+      structure: 'Standardized assessment with multiple-choice and short-answer questions. Tests are designed to measure proficiency against national benchmarks.',
+      link: 'https://etec.gov.sa/en/programs/nafs'
+    },
+    {
+      id: 'nafs_g9',
+      title: 'NAFS Grade 9',
+      summary: 'NAFS for Grade 9 assesses advanced fundamental skills as students transition to secondary education, focusing on literacy, numeracy, and scientific reasoning.',
+      content: 'Covers advanced reading comprehension, essay writing, algebra, geometry, basic sciences, and analytical thinking skills.',
+      structure: 'Comprehensive assessment including multiple sections for language, mathematics, and science. Results inform secondary school readiness.',
+      link: 'https://etec.gov.sa/en/programs/nafs'
+    },
+    {
+      id: 'qudurat',
+      title: 'Qudurat (القدرات)',
+      summary: 'The General Aptitude Test (Qudurat) measures analytical and inferential abilities essential for university-level learning, rather than memorized knowledge.',
+      content: 'Divided into Verbal (reading comprehension, analogies, sentence completion) and Quantitative (arithmetic, algebra, geometry, statistics) sections.',
+      structure: 'Multiple-choice format with 120 questions total. Typically taken in Grade 11-12. Scores are used alongside high school GPA for university admissions.',
+      link: 'https://etec.gov.sa/en/services/qiyas/tests/general-aptitude-test'
+    },
+    {
+      id: 'tahsili',
+      title: 'Tahsili (التحصيلي)',
+      summary: 'The Achievement Test (Tahsili) evaluates mastery of secondary school curriculum content across mathematics, sciences, English, and Arabic language.',
+      content: 'Covers Mathematics, Physics, Chemistry, Biology, and English based on secondary school curriculum. Available in separate tracks for Science and Arts streams.',
+      structure: 'Multiple-choice questions testing curriculum knowledge. Typically taken in Grade 12. Scores complement Qudurat results for university admissions.',
+      link: 'https://etec.gov.sa/en/services/qiyas/tests/achievement-test'
+    }
+  ];
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleExamSelect = (examId) => {
+    setSelectedExam(examId);
+    setSubmitMessage('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage('');
+
+    const selectedExamInfo = examInfo.find(exam => exam.id === selectedExam);
+    
+    const emailBody = `
+Parent Registration Request
+
+Selected Exam: ${selectedExamInfo.title}
+
+Parent Details:
+- Name: ${formData.parentName}
+- Email: ${formData.parentEmail}
+
+Student Details:
+- Name: ${formData.studentName}
+- School: ${formData.studentSchool}
+- Email: ${formData.studentEmail}
+
+Access Duration: ${formData.accessDuration}
+    `;
+
+    try {
+      const mailtoLink = `mailto:info@drfahm.com?subject=Parent Registration - ${selectedExamInfo.title}&body=${encodeURIComponent(emailBody)}`;
+      window.location.href = mailtoLink;
+      
+      setSubmitMessage('Registration request sent! We\'ll contact you within 24 hours to complete setup.');
+      
+      setTimeout(() => {
+        setFormData({
+          parentName: '',
+          parentEmail: '',
+          studentName: '',
+          studentSchool: '',
+          studentEmail: '',
+          accessDuration: '7days'
+        });
+        setSelectedExam(null);
+        setShowCTA(false);
+        setSubmitMessage('');
+      }, 3000);
+    } catch (error) {
+      setSubmitMessage('Error sending request. Please email info@drfahm.com directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="marketing-page">
@@ -26,246 +143,500 @@ function ParentPage() {
       <section className="page-hero" style={{ textAlign: 'center' }}>
         <div className="content-container-narrow">
           <h1 className="page-title">
-            Clarity before decisions become urgent.
+            Prepare your child for national assessments that shape their future
           </h1>
           
           <p className="page-subtitle">
-            Understand readiness early. Reduce stress. Keep options open.
+            NAFS, Qudurat, and Tahsili determine university placement and educational pathways. 
+            Understanding these exams early gives your child the preparation advantage.
           </p>
 
           <p className="page-body">
-            Dr Fahm helps parents understand where their child stands for NAFS, Qudurat, and 
-            Tahsili — privately, constructively, and early enough to make informed decisions.
+            Dr Fahm helps parents support their children's readiness through structured practice, 
+            clear progress tracking, and expert preparation for the exams that matter most.
           </p>
-
-          <div className="hero-ctas">
-            <button 
-              onClick={() => navigate('/start')} 
-              className="btn-cta-primary"
-            >
-              <span>Start Free Diagnostic</span>
-              <span className="btn-microcopy">See readiness in 10 minutes</span>
-            </button>
-          </div>
         </div>
       </section>
 
-      {/* What Parents Worry About */}
+      {/* Exam Information Cards */}
       <section className="content-section">
         <div className="content-container">
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            What parents worry about
+            Understanding the national assessments
           </h2>
 
-          <div style={{ 
+          <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '24px',
+            marginBottom: '48px'
           }}>
-            <div className="feature-block">
-              <h3>Uncertainty about readiness</h3>
-              <p>
-                You see your child studying, but have no real idea if they're prepared. 
-                Uncertainty compounds until it's too late.
-              </p>
-            </div>
+            {examInfo.map((exam) => (
+              <div
+                key={exam.id}
+                style={{
+                  background: 'var(--navy-800)',
+                  border: '2px solid var(--border-medium)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: '32px',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <h3 style={{
+                  fontSize: '24px',
+                  fontWeight: 'var(--font-weight-bold)',
+                  color: 'var(--text-primary)',
+                  marginBottom: '16px'
+                }}>
+                  {exam.title}
+                </h3>
 
-            <div className="feature-block">
-              <h3>Wasted effort on wrong areas</h3>
-              <p>
-                Time spent practicing doesn't always translate to improvement. 
-                You're not sure if effort is being directed effectively.
-              </p>
-            </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <h4 style={{
+                    fontSize: '14px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--accent-primary)',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    What it is
+                  </h4>
+                  <p style={{
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)',
+                    lineHeight: '1.6',
+                    margin: 0
+                  }}>
+                    {exam.summary}
+                  </p>
+                </div>
 
-            <div className="feature-block">
-              <h3>Last-minute panic</h3>
-              <p>
-                Waiting until exam season to understand gaps means options narrow. 
-                Decisions become reactive, not strategic.
-              </p>
-            </div>
-          </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <h4 style={{
+                    fontSize: '14px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--accent-primary)',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    Content covered
+                  </h4>
+                  <p style={{
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)',
+                    lineHeight: '1.6',
+                    margin: 0
+                  }}>
+                    {exam.content}
+                  </p>
+                </div>
 
-          <div style={{ 
-            background: 'rgba(79, 70, 229, 0.08)',
-            border: '1px solid rgba(79, 70, 229, 0.2)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '24px',
-            marginTop: '40px',
-            textAlign: 'center'
-          }}>
-            <p className="section-body" style={{ margin: 0, fontSize: '17px' }}>
-              Most families delay clarity until stress is unavoidable.
-            </p>
+                <div style={{ marginBottom: '24px' }}>
+                  <h4 style={{
+                    fontSize: '14px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--accent-primary)',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    Assessment structure
+                  </h4>
+                  <p style={{
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)',
+                    lineHeight: '1.6',
+                    margin: 0
+                  }}>
+                    {exam.structure}
+                  </p>
+                </div>
+
+                <a
+                  href={exam.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: 'var(--accent-primary)',
+                    textDecoration: 'none',
+                    fontSize: '14px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    transition: 'var(--transition)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.gap = '12px';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.gap = '8px';
+                  }}
+                >
+                  Learn more (ETEC official page)
+                  <span>→</span>
+                </a>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What Dr Fahm Provides */}
+      {/* CTA Button */}
       <section className="content-section bg-slate">
-        <div className="content-container-narrow">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            What Dr Fahm provides
-          </h2>
-
-          <div className="steps-vertical">
-            <div className="step-simple">
-              <div className="step-number-small">1</div>
-              <div className="step-content">
-                <h3>Early readiness visibility</h3>
-                <p>
-                  A diagnostic assessment shows where your child stands now — strengths, 
-                  gaps, and readiness patterns — long before exam pressure builds.
-                </p>
-              </div>
-            </div>
-
-            <div className="step-simple">
-              <div className="step-number-small">2</div>
-              <div className="step-content">
-                <h3>Structured preparation pathway</h3>
-                <p>
-                  Practice adapts to diagnostic results. Your child focuses on what 
-                  will actually improve readiness, not random content.
-                </p>
-              </div>
-            </div>
-
-            <div className="step-simple">
-              <div className="step-number-small">3</div>
-              <div className="step-content">
-                <h3>Progress tracking you can trust</h3>
-                <p>
-                  See whether effort is translating to improvement. Readiness updates 
-                  help you confirm preparation is working.
-                </p>
-              </div>
-            </div>
-
-            <div className="step-simple">
-              <div className="step-number-small">4</div>
-              <div className="step-content">
-                <h3>Privacy by default</h3>
-                <p>
-                  No public rankings. No comparisons with classmates. Readiness data 
-                  stays private unless you choose to share it.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why This Matters */}
-      <section className="content-section">
-        <div className="content-container-narrow text-content">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '32px' }}>
-            Why this matters
-          </h2>
-
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '32px',
-            marginBottom: '24px'
-          }}>
-            <p className="section-body">
-              <strong style={{ color: 'var(--text-primary)' }}>Earlier clarity reduces stress:</strong> Understanding 
-              readiness early keeps options open. Delaying clarity narrows them.
-            </p>
-          </div>
-
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '32px',
-            marginBottom: '24px'
-          }}>
-            <p className="section-body">
-              <strong style={{ color: 'var(--text-primary)' }}>Confirmation replaces guesswork:</strong> You know 
-              if effort is working. Preparation becomes intentional, not hopeful.
-            </p>
-          </div>
-
-          <div style={{ 
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '32px'
-          }}>
-            <p className="section-body">
-              <strong style={{ color: 'var(--text-primary)' }}>Better decisions, less panic:</strong> When you 
-              understand readiness months in advance, decisions are strategic, not reactive.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* What Parents See */}
-      <section className="content-section bg-slate">
-        <div className="content-container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            What you'll see
-          </h2>
-
-          <div className="two-col-grid">
-            <div className="feature-block">
-              <h3>Diagnostic results</h3>
-              <p>
-                Clear breakdown of strengths and gaps across exam topics. 
-                Understand readiness baselines before practice begins.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Personalized pathway</h3>
-              <p>
-                A practice plan tailored to your child's diagnostic results. 
-                Focus effort where it matters most.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Progress over time</h3>
-              <p>
-                Track readiness improvement week by week. Confirm that 
-                practice is translating to better performance.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Readiness signals</h3>
-              <p>
-                Clear indicators showing whether your child is on track, 
-                ahead, or needs additional support.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="final-cta-section">
-        <div className="content-container-narrow">
-          <h2 className="cta-title">
-            Understand readiness before decisions become urgent.
+        <div className="content-container-narrow" style={{ textAlign: 'center' }}>
+          <h2 className="section-title" style={{ marginBottom: '24px' }}>
+            Ready to get your child started?
           </h2>
           
-          <p className="cta-body">
-            Start with the diagnostic. See where your child stands. Confirm value before 
-            committing. All free to begin.
+          <p className="section-body" style={{ 
+            fontSize: '18px',
+            marginBottom: '32px'
+          }}>
+            Choose the exam your child needs to prepare for and complete a quick registration.
           </p>
 
-          <button 
-            onClick={() => navigate('/start')} 
-            className="btn-final-large"
+          <button
+            onClick={() => setShowCTA(!showCTA)}
+            className="btn-cta-primary"
+            style={{
+              fontSize: '18px',
+              padding: '18px 48px'
+            }}
           >
-            <span>Start Free Diagnostic</span>
-            <span className="btn-microcopy-inline">10 minutes · No payment required</span>
+            {showCTA ? 'Hide exam options' : 'Get my child started!'}
           </button>
+
+          {/* Exam Selection Dropdown */}
+          {showCTA && (
+            <div style={{
+              marginTop: '40px',
+              background: 'var(--navy-800)',
+              border: '2px solid var(--border-medium)',
+              borderRadius: 'var(--radius-xl)',
+              padding: '40px',
+              animation: 'fadeIn 0.3s ease'
+            }}>
+              <h3 style={{
+                fontSize: '22px',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--text-primary)',
+                marginBottom: '24px'
+              }}>
+                Select your child's exam
+              </h3>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: '16px',
+                marginBottom: '32px'
+              }}>
+                {examInfo.map((exam) => (
+                  <button
+                    key={exam.id}
+                    onClick={() => handleExamSelect(exam.id)}
+                    style={{
+                      padding: '16px',
+                      background: selectedExam === exam.id ? 'var(--accent-primary)' : 'var(--navy-950)',
+                      border: `2px solid ${selectedExam === exam.id ? 'var(--accent-primary)' : 'var(--border)'}`,
+                      borderRadius: 'var(--radius-lg)',
+                      color: selectedExam === exam.id ? '#FFFFFF' : 'var(--text-primary)',
+                      fontSize: '15px',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      cursor: 'pointer',
+                      transition: 'var(--transition)',
+                      fontFamily: 'inherit'
+                    }}
+                  >
+                    {exam.title}
+                  </button>
+                ))}
+              </div>
+
+              {/* Registration Form */}
+              {selectedExam && (
+                <form onSubmit={handleSubmit} style={{
+                  borderTop: '1px solid var(--border-subtle)',
+                  paddingTop: '32px',
+                  animation: 'fadeIn 0.3s ease'
+                }}>
+                  {submitMessage && (
+                    <div style={{
+                      background: 'rgba(79, 70, 229, 0.1)',
+                      border: '1px solid rgba(79, 70, 229, 0.3)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '16px',
+                      marginBottom: '24px',
+                      color: 'var(--accent-primary)',
+                      fontSize: '14px'
+                    }}>
+                      {submitMessage}
+                    </div>
+                  )}
+
+                  <h4 style={{
+                    fontSize: '18px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--text-primary)',
+                    marginBottom: '24px',
+                    textAlign: 'left'
+                  }}>
+                    Complete registration for {examInfo.find(e => e.id === selectedExam)?.title}
+                  </h4>
+
+                  {/* Parent Details */}
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '24px',
+                    marginBottom: '24px'
+                  }}>
+                    <h5 style={{
+                      fontSize: '16px',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--text-primary)',
+                      marginBottom: '16px'
+                    }}>
+                      Parent Information
+                    </h5>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontSize: '14px',
+                        color: 'var(--text-secondary)',
+                        textAlign: 'left'
+                      }}>
+                        Your Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="parentName"
+                        value={formData.parentName}
+                        onChange={handleChange}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'var(--navy-950)',
+                          border: '1.5px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          color: 'var(--text-primary)',
+                          fontSize: '15px',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontSize: '14px',
+                        color: 'var(--text-secondary)',
+                        textAlign: 'left'
+                      }}>
+                        Your Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="parentEmail"
+                        value={formData.parentEmail}
+                        onChange={handleChange}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'var(--navy-950)',
+                          border: '1.5px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          color: 'var(--text-primary)',
+                          fontSize: '15px',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Student Details */}
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '24px',
+                    marginBottom: '24px'
+                  }}>
+                    <h5 style={{
+                      fontSize: '16px',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--text-primary)',
+                      marginBottom: '16px'
+                    }}>
+                      Student Information
+                    </h5>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontSize: '14px',
+                        color: 'var(--text-secondary)',
+                        textAlign: 'left'
+                      }}>
+                        Student Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="studentName"
+                        value={formData.studentName}
+                        onChange={handleChange}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'var(--navy-950)',
+                          border: '1.5px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          color: 'var(--text-primary)',
+                          fontSize: '15px',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontSize: '14px',
+                        color: 'var(--text-secondary)',
+                        textAlign: 'left'
+                      }}>
+                        School Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="studentSchool"
+                        value={formData.studentSchool}
+                        onChange={handleChange}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'var(--navy-950)',
+                          border: '1.5px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          color: 'var(--text-primary)',
+                          fontSize: '15px',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        marginBottom: '8px',
+                        fontSize: '14px',
+                        color: 'var(--text-secondary)',
+                        textAlign: 'left'
+                      }}>
+                        Student Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="studentEmail"
+                        value={formData.studentEmail}
+                        onChange={handleChange}
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '12px 16px',
+                          background: 'var(--navy-950)',
+                          border: '1.5px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          color: 'var(--text-primary)',
+                          fontSize: '15px',
+                          fontFamily: 'inherit'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Access Duration */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <label style={{
+                      display: 'block',
+                      marginBottom: '8px',
+                      fontSize: '14px',
+                      fontWeight: 'var(--font-weight-semibold)',
+                      color: 'var(--text-primary)',
+                      textAlign: 'left'
+                    }}>
+                      Preferred Access Duration *
+                    </label>
+                    <select
+                      name="accessDuration"
+                      value={formData.accessDuration}
+                      onChange={handleChange}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        background: 'var(--navy-950)',
+                        border: '1.5px solid var(--border)',
+                        borderRadius: 'var(--radius-md)',
+                        color: 'var(--text-primary)',
+                        fontSize: '15px',
+                        fontFamily: 'inherit',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="7days">7-day free trial</option>
+                      <option value="3months">3 months</option>
+                      <option value="6months">6 months</option>
+                    </select>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn-cta-primary"
+                    style={{
+                      width: '100%',
+                      fontSize: '16px'
+                    }}
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Complete Registration'}
+                  </button>
+
+                  <p style={{
+                    marginTop: '16px',
+                    fontSize: '13px',
+                    color: 'var(--text-tertiary)',
+                    textAlign: 'center'
+                  }}>
+                    We'll contact you within 24 hours to confirm access
+                  </p>
+                </form>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -275,7 +646,7 @@ function ParentPage() {
           <div className="footer-simple">
             <div className="footer-brand">
               <h3>Dr Fahm</h3>
-              <p>National Assessment & Readiness Platform</p>
+              <p>The Blueprint for 100%</p>
             </div>
 
             <nav className="footer-links-inline">
@@ -286,7 +657,7 @@ function ParentPage() {
           </div>
 
           <div className="footer-bottom">
-            <p>&copy; 2025 Dr Fahm. All rights reserved.</p>
+            <p>&copy; 2026 Dr Fahm. All rights reserved.</p>
           </div>
         </div>
       </footer>

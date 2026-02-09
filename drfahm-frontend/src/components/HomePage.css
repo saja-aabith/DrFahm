@@ -96,45 +96,63 @@
    ========================================== */
 
 .nav-institutional {
+  background: rgba(10, 15, 28, 0.72); /* slightly clearer glass */
+  backdrop-filter: blur(22px) saturate(190%);
+  -webkit-backdrop-filter: blur(22px) saturate(190%);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: rgba(10, 15, 28, 0.85);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid var(--border-subtle);
-  transition: all 0.3s ease;
+}
+
+.nav-institutional::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 92, 246, 0.35),
+    rgba(16, 185, 129, 0.25),
+    transparent
+  );
+  opacity: 0.9;
+  pointer-events: none;
 }
 
 .nav-institutional.scrolled {
-  background: rgba(10, 15, 28, 0.95);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  border-bottom: 1px solid var(--border-medium);
+  background: rgba(10, 15, 28, 0.88);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.55);
 }
+
 
 .nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: var(--space-md) var(--space-xl);
+  padding: 18px var(--space-xl); /* was: var(--space-md) var(--space-xl) */
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--space-lg);
 }
 
+
 .nav-brand h1 {
-  font-size: 32px;
+  font-size: 30px;      /* was 32px (fine), but this is tighter */
   font-weight: 900;
   color: var(--text-primary);
   margin: 0;
-  letter-spacing: -1px;
+  letter-spacing: -0.8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .nav-brand h1:hover {
   color: var(--accent-light);
 }
+
+
+
 
 .nav-center {
   display: flex;
@@ -144,18 +162,40 @@
 }
 
 .nav-center a {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 16px;          /* was 14px */
+  font-weight: 650;         /* was 600 */
+  color: rgba(255,255,255,0.82); /* clearer than text-secondary */
   text-decoration: none;
+  padding: 10px 14px;       /* bigger click target */
+  border-radius: var(--radius-md);
   transition: var(--transition);
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
+  letter-spacing: 0.2px;
 }
 
 .nav-center a:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-1px);
+}
+
+
+.nav-center a::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-light));
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 220ms ease;
+  opacity: 0.9;
+}
+
+.nav-center a:hover::after {
+  transform: scaleX(1);
 }
 
 .nav-actions {
@@ -185,12 +225,12 @@
 }
 
 .btn-nav-text {
-  padding: 12px 20px;
+  padding: 10px 16px;   /* slightly tighter */
   background: transparent;
   border: none;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 600;
+  color: rgba(255,255,255,0.82); /* clearer */
+  font-size: 15.5px;    /* was 14px */
+  font-weight: 650;
   cursor: pointer;
   transition: var(--transition);
 }
@@ -198,6 +238,7 @@
 .btn-nav-text:hover {
   color: var(--text-primary);
 }
+
 
 /* ==========================================
    2) HERO - ABOVE THE FOLD
@@ -1661,7 +1702,7 @@
   padding: 18px 48px;
   font-size: 18px;
   font-weight: 600;
-  background: var(--green-ksa);
+  background: var(--green-primary);
   color: #FFFFFF;
   border: none;
   border-radius: var(--radius-lg);

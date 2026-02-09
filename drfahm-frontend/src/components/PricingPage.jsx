@@ -1,9 +1,138 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import './marketing.css';
 
 function PricingPage() {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const pricingPlans = [
+    {
+      id: 'free',
+      name: 'Free Practice',
+      subtitle: 'Trial',
+      price: 'Free',
+      priceAmount: 0,
+      duration: 'Limited (eg 7 days)',
+      worldsUnlocked: 'Worlds 1–2',
+      questionBank: 'Limited',
+      features: [
+        'Basic practice questions',
+        'Limited question bank',
+        'Access to first 2 worlds',
+        '7-day access',
+        'Basic progress tracking'
+      ],
+      cta: 'Start Free Trial',
+      highlight: false,
+      stripe: false
+    },
+    {
+      id: 'basic',
+      name: 'Basic',
+      subtitle: 'For dedicated students',
+      price: 'SAR 199',
+      priceAmount: 199,
+      duration: '3 months',
+      worldsUnlocked: 'Worlds 1–5',
+      questionBank: 'Expanded',
+      features: [
+        'Expanded question bank',
+        'Access to worlds 1-5',
+        '3 months full access',
+        'Progress tracking & analytics',
+        'Email support',
+        'Mobile & desktop access'
+      ],
+      cta: 'Subscribe to Basic',
+      highlight: false,
+      stripe: true,
+      stripePriceId: 'price_basic_3months' // Replace with actual Stripe Price ID
+    },
+    {
+      id: 'premium',
+      name: 'Premium',
+      subtitle: '⭐ Best Value',
+      price: 'SAR 299',
+      priceAmount: 299,
+      duration: '6 months',
+      worldsUnlocked: 'Worlds 1–10',
+      questionBank: 'Full',
+      features: [
+        'Full question bank access',
+        'All 10 worlds unlocked',
+        '6 months full access',
+        'Advanced analytics & insights',
+        'Priority email support',
+        'Mobile & desktop access',
+        'Downloadable progress reports'
+      ],
+      cta: 'Subscribe to Premium',
+      highlight: true,
+      stripe: true,
+      stripePriceId: 'price_premium_6months' // Replace with actual Stripe Price ID
+    }
+  ];
+
+  const handleSubscribe = async (plan) => {
+    // Check if user is logged in
+    if (!isAuthenticated) {
+      // Store intended plan in sessionStorage to redirect back after login
+      sessionStorage.setItem('intendedPlan', plan.id);
+      navigate('/login', { state: { from: '/pricing', plan: plan.id } });
+      return;
+    }
+
+    // If free trial, navigate to student page
+    if (plan.id === 'free') {
+      navigate('/student');
+      return;
+    }
+
+    // For paid plans, process Stripe payment
+    if (plan.stripe) {
+      setIsProcessing(true);
+      
+      try {
+        // Call your backend to create Stripe Checkout session
+        const response = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}` // If you use JWT
+          },
+          body: JSON.stringify({
+            priceId: plan.stripePriceId,
+            userId: user.id,
+            planId: plan.id,
+            successUrl: `${window.location.origin}/payment/success`,
+            cancelUrl: `${window.location.origin}/pricing`
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create checkout session');
+        }
+
+        const { sessionId, url } = await response.json();
+
+        // Redirect to Stripe Checkout
+        if (url) {
+          window.location.href = url;
+        } else {
+          // Fallback: use Stripe.js
+          const stripe = window.Stripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
+          await stripe.redirectToCheckout({ sessionId });
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        alert('Failed to process payment. Please try again or contact support.');
+        setIsProcessing(false);
+      }
+    }
+  };
 
   return (
     <div className="marketing-page">
@@ -12,285 +141,457 @@ function PricingPage() {
         <div className="nav-container">
           <div className="nav-brand" onClick={() => navigate('/')}>
             <h1>Dr Fahm</h1>
-            <span className="nav-subtitle">National Assessment & Readiness Platform</span>
+            <span className="nav-subtitle">The Blueprint for 100%</span>
           </div>
           
           <div className="nav-actions">
-            <button onClick={() => navigate('/schools')} className="btn-nav-secondary">
-              For Schools
-            </button>
             <button onClick={() => navigate('/login')} className="btn-nav-primary">
-              Login / Sign Up
+              {isAuthenticated ? 'Dashboard' : 'Login / Sign Up'}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero - Pricing Philosophy */}
+      {/* Hero */}
       <section className="page-hero" style={{ textAlign: 'center' }}>
         <div className="content-container-narrow">
           <h1 className="page-title">
-            Clear pricing. No lock-in.
+            Choose your learning plan
           </h1>
           
           <p className="page-subtitle">
-            Try the platform first. Decide if it's right for you. Subscribe only when you're certain.
+            Start with a free trial, then upgrade when you're ready for full access
           </p>
 
           <p className="page-body">
-            Dr Fahm operates on a simple principle: clarity before commitment. You shouldn't pay 
-            for something until you've confirmed it works for you.
+            All plans include bilingual practice (Arabic & English), instant feedback, 
+            and progress tracking for NAFS, Qudurat, and Tahsili exams.
           </p>
         </div>
       </section>
 
-      {/* Pricing Philosophy */}
+      {/* Pricing Comparison Table */}
       <section className="content-section">
-        <div className="content-container-narrow text-content">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '32px' }}>
-            Our pricing philosophy
-          </h2>
-
-          <p className="section-body" style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>
-            Most platforms ask for payment upfront. We don't. You should experience the diagnostic, 
-            see how the system works, and confirm value before deciding whether to subscribe.
-          </p>
-
-          <p className="section-body" style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>
-            This means our pricing is simple, transparent, and built around what users actually need — 
-            not what maximizes revenue.
-          </p>
-
-          <div style={{ 
-            background: 'rgba(79, 70, 229, 0.08)',
-            border: '1px solid rgba(79, 70, 229, 0.2)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '32px',
-            marginTop: '40px'
-          }}>
-            <p className="section-body" style={{ 
-              margin: 0, 
-              fontSize: '18px',
-              color: 'var(--text-secondary)',
-              textAlign: 'center'
-            }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Trial first, always.</strong> No payment 
-              details required. No automatic charges. No pressure.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Individual Access */}
-      <section className="content-section bg-slate">
         <div className="content-container">
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            Individual access
+            Easy Access
           </h2>
 
-          <div style={{ 
-            maxWidth: '600px',
+          {/* Full Comparison Table */}
+          <div style={{
+            maxWidth: '1000px',
+            margin: '0 auto 48px',
+            background: 'var(--navy-800)',
+            border: '2px solid var(--border-medium)',
+            borderRadius: 'var(--radius-xl)',
+            overflow: 'hidden'
+          }}>
+            <table style={{
+              width: '100%',
+              borderCollapse: 'collapse'
+            }}>
+              <thead>
+                <tr style={{
+                  background: 'rgba(79, 70, 229, 0.1)',
+                  borderBottom: '2px solid var(--border-medium)'
+                }}>
+                  <th style={{
+                    padding: '20px 24px',
+                    textAlign: 'left',
+                    fontSize: '16px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--text-primary)',
+                    minWidth: '180px'
+                  }}>
+                    Feature
+                  </th>
+                  <th style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '16px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    Free Practice (Trial)
+                  </th>
+                  <th style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '16px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    Basic
+                  </th>
+                  <th style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '16px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(79, 70, 229, 0.05)'
+                  }}>
+                    Premium ⭐ Best Value
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <td style={{
+                    padding: '20px 24px',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    Price
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '18px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    Free
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '18px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    SAR 199
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '18px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(79, 70, 229, 0.05)'
+                  }}>
+                    SAR 299
+                  </td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <td style={{
+                    padding: '20px 24px',
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Access period
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Limited (eg 7 days)
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    3 months
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(79, 70, 229, 0.05)'
+                  }}>
+                    6 months
+                  </td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                  <td style={{
+                    padding: '20px 24px',
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Worlds unlocked
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Worlds 1–2
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    Worlds 1–5
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(79, 70, 229, 0.05)'
+                  }}>
+                    Worlds 1–10
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{
+                    padding: '20px 24px',
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Question bank depth
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Limited
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--text-primary)'
+                  }}>
+                    Expanded
+                  </td>
+                  <td style={{
+                    padding: '20px 24px',
+                    textAlign: 'center',
+                    fontSize: '15px',
+                    fontWeight: 'var(--font-weight-semibold)',
+                    color: 'var(--accent-primary)',
+                    background: 'rgba(79, 70, 229, 0.05)'
+                  }}>
+                    Full
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pricing Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '24px',
+            maxWidth: '1200px',
             margin: '0 auto'
           }}>
-            <div style={{ 
-              background: 'var(--navy-800)',
-              border: '2px solid var(--accent-primary)',
-              borderRadius: 'var(--radius-xl)',
-              padding: '48px',
-              boxShadow: 'var(--shadow-xl)'
-            }}>
-              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <div style={{ 
-                  display: 'inline-block',
-                  padding: '8px 16px',
-                  background: 'rgba(79, 70, 229, 0.1)',
-                  border: '1px solid rgba(79, 70, 229, 0.3)',
-                  borderRadius: '999px',
-                  fontSize: '13px',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  color: 'var(--accent-primary)',
-                  marginBottom: '16px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  For Students & Parents
-                </div>
-                <h3 style={{ 
-                  fontSize: '42px',
-                  fontWeight: 'var(--font-weight-black)',
-                  color: 'var(--text-primary)',
-                  margin: '0 0 8px 0'
-                }}>
-                  Free Trial
-                </h3>
-                <p style={{ 
-                  fontSize: '18px',
-                  color: 'var(--text-tertiary)',
-                  margin: 0
-                }}>
-                  Then SAR 99/month
-                </p>
-              </div>
-
-              <div style={{ 
-                borderTop: '1px solid var(--border-subtle)',
-                borderBottom: '1px solid var(--border-subtle)',
-                padding: '32px 0',
-                margin: '32px 0'
-              }}>
-                <ul className="check-list" style={{ fontSize: '16px' }}>
-                  <li>Full diagnostic assessment</li>
-                  <li>Personalized readiness pathway</li>
-                  <li>Practice questions for Qudurat, Tahsili, NAFS</li>
-                  <li>Progress tracking & readiness signals</li>
-                  <li>Private profile (no public rankings)</li>
-                  <li>Mobile & desktop access</li>
-                  <li>Cancel anytime, no lock-in</li>
-                </ul>
-              </div>
-
-              <button 
-                onClick={() => navigate('/start')} 
-                className="btn-cta-primary"
-                style={{ width: '100%' }}
+            {pricingPlans.map((plan) => (
+              <div
+                key={plan.id}
+                style={{
+                  background: plan.highlight ? 'linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, var(--navy-800) 100%)' : 'var(--navy-800)',
+                  border: plan.highlight ? '3px solid var(--accent-primary)' : '2px solid var(--border-medium)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: '40px 32px',
+                  position: 'relative',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
               >
-                <span>Start Free Trial</span>
-                <span className="btn-microcopy">No payment details required</span>
-              </button>
+                {plan.highlight && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '-14px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'var(--accent-primary)',
+                    color: '#FFFFFF',
+                    padding: '6px 20px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '13px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    letterSpacing: '0.5px'
+                  }}>
+                    BEST VALUE
+                  </div>
+                )}
 
-              <p style={{ 
-                fontSize: '13px',
-                color: 'var(--text-tertiary)',
-                textAlign: 'center',
-                margin: '16px 0 0 0'
-              }}>
-                After trial, you'll be prompted to subscribe. No automatic charges.
-              </p>
-            </div>
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <h3 style={{
+                    fontSize: '28px',
+                    fontWeight: 'var(--font-weight-black)',
+                    color: plan.highlight ? 'var(--accent-primary)' : 'var(--text-primary)',
+                    marginBottom: '8px'
+                  }}>
+                    {plan.name}
+                  </h3>
+                  <p style={{
+                    fontSize: '14px',
+                    color: 'var(--text-tertiary)',
+                    marginBottom: '16px'
+                  }}>
+                    {plan.subtitle}
+                  </p>
+                  <div style={{
+                    fontSize: '48px',
+                    fontWeight: 'var(--font-weight-black)',
+                    color: 'var(--text-primary)',
+                    marginBottom: '8px'
+                  }}>
+                    {plan.price}
+                  </div>
+                  <p style={{
+                    fontSize: '15px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    {plan.duration}
+                  </p>
+                </div>
+
+                <div style={{
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '20px',
+                  marginBottom: '24px',
+                  flex: 1
+                }}>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0
+                  }}>
+                    {plan.features.map((feature, index) => (
+                      <li key={index} style={{
+                        padding: '10px 0',
+                        borderBottom: index < plan.features.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                        fontSize: '15px',
+                        color: 'var(--text-secondary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px'
+                      }}>
+                        <span style={{
+                          color: plan.highlight ? 'var(--accent-primary)' : 'var(--text-primary)',
+                          fontSize: '18px',
+                          flexShrink: 0
+                        }}>
+                          ✓
+                        </span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  onClick={() => handleSubscribe(plan)}
+                  disabled={isProcessing}
+                  style={{
+                    width: '100%',
+                    padding: '16px 24px',
+                    background: plan.highlight ? 'var(--accent-primary)' : 'var(--navy-950)',
+                    border: plan.highlight ? 'none' : '2px solid var(--border-medium)',
+                    borderRadius: 'var(--radius-lg)',
+                    color: plan.highlight ? '#FFFFFF' : 'var(--text-primary)',
+                    fontSize: '16px',
+                    fontWeight: 'var(--font-weight-bold)',
+                    cursor: isProcessing ? 'not-allowed' : 'pointer',
+                    transition: 'var(--transition)',
+                    fontFamily: 'inherit',
+                    opacity: isProcessing ? 0.6 : 1
+                  }}
+                >
+                  {isProcessing ? 'Processing...' : plan.cta}
+                </button>
+
+                {!isAuthenticated && plan.stripe && (
+                  <p style={{
+                    marginTop: '12px',
+                    fontSize: '13px',
+                    color: 'var(--text-tertiary)',
+                    textAlign: 'center'
+                  }}>
+                    Login required to subscribe
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="content-section">
-        <div className="content-container-narrow">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            What's included
-          </h2>
-
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: '1fr',
-            gap: '20px'
-          }}>
-            <div className="feature-block">
-              <h3>Diagnostic-first approach</h3>
-              <p>
-                Every subscription includes a comprehensive diagnostic assessment to identify 
-                strengths, gaps, and readiness baselines before practice begins.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Personalized pathways</h3>
-              <p>
-                Preparation adapts to diagnostic results. You practice what matters most for 
-                your readiness, not random questions.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Multi-assessment coverage</h3>
-              <p>
-                Access to Qudurat (verbal & quantitative), Tahsili (all subjects), and NAFS 
-                (foundational skills) — all in one platform.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Progress visibility</h3>
-              <p>
-                Track readiness over time with clear signals, not just scores. Understand 
-                whether effort is translating to improvement.
-              </p>
-            </div>
-
-            <div className="feature-block">
-              <h3>Privacy by default</h3>
-              <p>
-                No public leaderboards. No comparison with others. Your readiness data stays 
-                private unless you choose to share it.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Schools Pricing */}
+      {/* Payment Methods */}
       <section className="content-section bg-slate">
-        <div className="content-container">
-          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            Schools & organizations
+        <div className="content-container-narrow">
+          <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '32px' }}>
+            Secure payment methods
           </h2>
 
-          <div className="content-container-narrow">
-            <div style={{ 
+          <p className="section-body" style={{
+            textAlign: 'center',
+            marginBottom: '32px',
+            fontSize: '17px'
+          }}>
+            We accept Mada and major debit cards. All payments are processed securely through Stripe.
+          </p>
+
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '32px',
+            flexWrap: 'wrap'
+          }}>
+            <div style={{
+              padding: '16px 24px',
               background: 'var(--navy-800)',
               border: '1px solid var(--border-medium)',
-              borderRadius: 'var(--radius-xl)',
-              padding: '48px',
-              textAlign: 'center'
+              borderRadius: 'var(--radius-lg)',
+              fontSize: '18px',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--text-primary)'
             }}>
-              <div style={{ fontSize: '48px', marginBottom: '24px' }}>🏫</div>
-              
-              <h3 style={{ 
-                fontSize: '32px',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--text-primary)',
-                margin: '0 0 16px 0'
-              }}>
-                Cohort-based pricing
-              </h3>
-              
-              <p style={{ 
-                fontSize: '17px',
-                color: 'var(--text-tertiary)',
-                marginBottom: '32px',
-                lineHeight: '1.6'
-              }}>
-                Schools and organizations receive cohort-level access with dashboards, 
-                reporting, and implementation support. Pricing scales with cohort size.
-              </p>
-
-              <ul className="check-list" style={{ 
-                textAlign: 'left',
-                maxWidth: '480px',
-                margin: '0 auto 40px'
-              }}>
-                <li>Diagnostic assessments for all students</li>
-                <li>Centralized cohort dashboards</li>
-                <li>Progress tracking & reporting</li>
-                <li>Parent-facing visibility</li>
-                <li>Implementation & training support</li>
-                <li>Pilot options available</li>
-              </ul>
-
-              <button 
-                onClick={() => window.location.href = 'mailto:schools@drfahm.com?subject=School Pricing Enquiry'} 
-                className="btn-cta-primary"
-              >
-                <span>Contact Schools Team</span>
-                <span className="btn-microcopy">Discuss cohort pricing</span>
-              </button>
-
-              <p style={{ 
-                fontSize: '13px',
-                color: 'var(--text-tertiary)',
-                margin: '16px 0 0 0'
-              }}>
-                We recommend starting with a pilot cohort to validate value before scaling.
-              </p>
+              MADA
             </div>
+            <div style={{
+              padding: '16px 24px',
+              background: 'var(--navy-800)',
+              border: '1px solid var(--border-medium)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: '18px',
+              fontWeight: 'var(--font-weight-bold)',
+              color: 'var(--text-primary)'
+            }}>
+              Visa
+            </div>
+          </div>
+
+          <div style={{
+            marginTop: '32px',
+            padding: '20px',
+            background: 'rgba(79, 70, 229, 0.05)',
+            border: '1px solid rgba(79, 70, 229, 0.2)',
+            borderRadius: 'var(--radius-lg)',
+            textAlign: 'center'
+          }}>
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              margin: 0
+            }}>
+              🔒 Your payment information is encrypted and secure. We never store your card details.
+            </p>
           </div>
         </div>
       </section>
@@ -299,73 +600,21 @@ function PricingPage() {
       <section className="content-section">
         <div className="content-container-narrow">
           <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '48px' }}>
-            Pricing questions
+            Frequently asked questions
           </h2>
 
-          <div style={{ 
+          <div style={{
             display: 'grid',
             gridTemplateColumns: '1fr',
             gap: '24px'
           }}>
-            <div style={{ 
-              background: 'var(--glass-bg)',
-              border: '1px solid var(--border-subtle)',
+            <div style={{
+              background: 'var(--navy-800)',
+              border: '1px solid var(--border-medium)',
               borderRadius: 'var(--radius-lg)',
               padding: '24px'
             }}>
-              <h3 style={{ 
-                fontSize: '18px',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--text-primary)',
-                marginBottom: '12px'
-              }}>
-                How long is the free trial?
-              </h3>
-              <p style={{ 
-                fontSize: '16px',
-                color: 'var(--text-tertiary)',
-                margin: 0,
-                lineHeight: '1.6'
-              }}>
-                The trial includes the full diagnostic assessment and initial pathway generation. 
-                You can explore the platform and confirm value before subscribing. There's no 
-                time limit on the trial.
-              </p>
-            </div>
-
-            <div style={{ 
-              background: 'var(--glass-bg)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '24px'
-            }}>
-              <h3 style={{ 
-                fontSize: '18px',
-                fontWeight: 'var(--font-weight-bold)',
-                color: 'var(--text-primary)',
-                marginBottom: '12px'
-              }}>
-                Do I need to provide payment details for the trial?
-              </h3>
-              <p style={{ 
-                fontSize: '16px',
-                color: 'var(--text-tertiary)',
-                margin: 0,
-                lineHeight: '1.6'
-              }}>
-                No. You can complete the diagnostic and explore the platform without providing 
-                any payment information. You'll only be asked to subscribe when you decide to 
-                continue.
-              </p>
-            </div>
-
-            <div style={{ 
-              background: 'var(--glass-bg)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '24px'
-            }}>
-              <h3 style={{ 
+              <h3 style={{
                 fontSize: '18px',
                 fontWeight: 'var(--font-weight-bold)',
                 color: 'var(--text-primary)',
@@ -373,65 +622,89 @@ function PricingPage() {
               }}>
                 Can I cancel anytime?
               </h3>
-              <p style={{ 
-                fontSize: '16px',
-                color: 'var(--text-tertiary)',
+              <p style={{
+                fontSize: '15px',
+                color: 'var(--text-secondary)',
                 margin: 0,
                 lineHeight: '1.6'
               }}>
-                Yes. There are no contracts or lock-in periods. Cancel from your account settings 
-                at any time. Your access continues until the end of your current billing period.
+                Yes. Your subscription continues until the end of your current period, 
+                then automatically cancels. No refunds for partial months.
               </p>
             </div>
 
-            <div style={{ 
-              background: 'var(--glass-bg)',
-              border: '1px solid var(--border-subtle)',
+            <div style={{
+              background: 'var(--navy-800)',
+              border: '1px solid var(--border-medium)',
               borderRadius: 'var(--radius-lg)',
               padding: '24px'
             }}>
-              <h3 style={{ 
+              <h3 style={{
                 fontSize: '18px',
                 fontWeight: 'var(--font-weight-bold)',
                 color: 'var(--text-primary)',
                 marginBottom: '12px'
               }}>
-                What payment methods do you accept?
+                Can I upgrade from Basic to Premium?
               </h3>
-              <p style={{ 
-                fontSize: '16px',
-                color: 'var(--text-tertiary)',
+              <p style={{
+                fontSize: '15px',
+                color: 'var(--text-secondary)',
                 margin: 0,
                 lineHeight: '1.6'
               }}>
-                We accept all major credit cards (Visa, Mastercard, Amex) and local payment 
-                methods common in Saudi Arabia. Payment is processed securely through Stripe.
+                Yes. You'll be charged the prorated difference and your access will 
+                immediately upgrade to Premium with all worlds unlocked.
               </p>
             </div>
 
-            <div style={{ 
-              background: 'var(--glass-bg)',
-              border: '1px solid var(--border-subtle)',
+            <div style={{
+              background: 'var(--navy-800)',
+              border: '1px solid var(--border-medium)',
               borderRadius: 'var(--radius-lg)',
               padding: '24px'
             }}>
-              <h3 style={{ 
+              <h3 style={{
                 fontSize: '18px',
                 fontWeight: 'var(--font-weight-bold)',
                 color: 'var(--text-primary)',
                 marginBottom: '12px'
               }}>
-                Is there a discount for annual subscriptions?
+                What happens after my subscription expires?
               </h3>
-              <p style={{ 
-                fontSize: '16px',
-                color: 'var(--text-tertiary)',
+              <p style={{
+                fontSize: '15px',
+                color: 'var(--text-secondary)',
                 margin: 0,
                 lineHeight: '1.6'
               }}>
-                We currently offer monthly subscriptions only. This gives users maximum flexibility 
-                to pause or cancel without long-term commitment. Annual options may be introduced 
-                based on demand.
+                Your progress is saved, but practice access is restricted to the free 
+                trial level (Worlds 1-2) until you renew.
+              </p>
+            </div>
+
+            <div style={{
+              background: 'var(--navy-800)',
+              border: '1px solid var(--border-medium)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '24px'
+            }}>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--text-primary)',
+                marginBottom: '12px'
+              }}>
+                Do you offer refunds?
+              </h3>
+              <p style={{
+                fontSize: '15px',
+                color: 'var(--text-secondary)',
+                margin: 0,
+                lineHeight: '1.6'
+              }}>
+                We offer a 7-day money-back guarantee. If you're not satisfied within 
+                the first 7 days, contact support for a full refund.
               </p>
             </div>
           </div>
@@ -442,30 +715,21 @@ function PricingPage() {
       <section className="final-cta-section">
         <div className="content-container-narrow">
           <h2 className="cta-title">
-            Try Dr Fahm with no commitment.
+            Start your free trial today
           </h2>
           
           <p className="cta-body">
-            Start with the free trial. Explore diagnostics. Confirm the platform works for you. 
-            Subscribe only when you're certain it's right.
+            No payment required. Try the platform, see the results, 
+            then upgrade when you're ready.
           </p>
 
           <button 
-            onClick={() => navigate('/start')} 
+            onClick={() => navigate('/student')} 
             className="btn-final-large"
           >
             <span>Start Free Trial</span>
-            <span className="btn-microcopy-inline">No payment details required</span>
+            <span className="btn-microcopy-inline">7 days · No credit card required</span>
           </button>
-
-          <div style={{ marginTop: '24px' }}>
-            <button 
-              onClick={() => navigate('/schools')} 
-              className="btn-cta-secondary-text"
-            >
-              Schools: Contact us for pricing →
-            </button>
-          </div>
         </div>
       </section>
 
@@ -475,21 +739,19 @@ function PricingPage() {
           <div className="footer-simple">
             <div className="footer-brand">
               <h3>Dr Fahm</h3>
-              <p>National Assessment & Readiness Platform</p>
+              <p>The Blueprint for 100%</p>
             </div>
 
             <nav className="footer-links-inline">
-              <a href="#qudurat" onClick={() => navigate('/qudurat')}>Qudurat</a>
-              <a href="#tahsili" onClick={() => navigate('/tahsili')}>Tahsili</a>
-              <a href="#nafs" onClick={() => navigate('/nafs')}>NAFS</a>
-              <a href="#schools" onClick={() => navigate('/schools')}>For Schools</a>
-              <a href="#about" onClick={() => navigate('/about')}>About</a>
-              <a href="#contact" onClick={() => navigate('/contact')}>Contact</a>
+              <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>Home</a>
+              <a href="/student" onClick={(e) => { e.preventDefault(); navigate('/student'); }}>For Students</a>
+              <a href="/parent" onClick={(e) => { e.preventDefault(); navigate('/parent'); }}>For Parents</a>
+              <a href="/schools" onClick={(e) => { e.preventDefault(); navigate('/schools'); }}>For Schools</a>
             </nav>
           </div>
 
           <div className="footer-bottom">
-            <p>&copy; 2025 Dr Fahm. All rights reserved.</p>
+            <p>&copy; 2026 Dr Fahm. All rights reserved.</p>
           </div>
         </div>
       </footer>

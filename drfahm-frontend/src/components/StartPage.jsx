@@ -16,7 +16,7 @@ function StartPage() {
         <div className="nav-container">
           <div className="nav-brand" onClick={() => navigate('/')}>
             <h1>Dr Fahm</h1>
-            <span className="nav-subtitle">National Assessment & Readiness Platform</span>
+            <span className="nav-subtitle">The Blueprint for 100%</span>
           </div>
           
           <div className="nav-actions">
@@ -283,7 +283,7 @@ function StartPage() {
           </div>
 
           <div className="footer-bottom">
-            <p>&copy; 2025 Dr Fahm. All rights reserved.</p>
+            <p>&copy; 2026 Dr Fahm. All rights reserved.</p>
           </div>
         </div>
       </footer>
