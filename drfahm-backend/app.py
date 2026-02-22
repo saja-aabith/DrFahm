@@ -3,8 +3,19 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-from models import db, User, Question, Attempt
+from models import (
+    db,
+    User,
+    Organization,
+    Question,
+    QuestionAttempt,
+    LevelCompletion,
+    UserExamEntitlement,
+    OrgExamEntitlement,
+    StripeEvent,
+)
 from questions_data import QUESTIONS_DATA
+from flask_migrate import Migrate
 import os
 
 app = Flask(__name__)
@@ -32,6 +43,9 @@ CORS(app, resources={
 # Initialize extensions
 jwt = JWTManager(app)
 db.init_app(app)
+
+migrate = Migrate(app, db)
+
 
 # JWT error handlers
 @jwt.unauthorized_loader
